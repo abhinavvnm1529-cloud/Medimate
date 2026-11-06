@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>MediMate</title>
+<link rel="icon" type="image/png" href="medimate-icon-192.png">
+</head><body>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL@24,400,0..1" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{max-width:100%;overflow-x:hidden}
+  body{background:#e8eaed;display:block;padding:12px;font-family:'Google Sans',Roboto,Arial,sans-serif}
+  button{font-family:inherit}
+  .ms{font-family:'Material Symbols Rounded';font-size:24px;line-height:1;font-variation-settings:'FILL' 0;vertical-align:middle}
+  .phone{position:relative;width:100%;max-width:380px;margin:0 auto;height:740px;background:#fff;border-radius:36px;overflow:hidden;
+         box-shadow:0 8px 30px rgba(0,0,0,.25);border:8px solid #1f1f1f;color:#1f1f1f}
+  /* splash */
+  #splash{position:absolute;inset:0;background:#fff;z-index:80;display:flex;flex-direction:column;
+          align-items:center;justify-content:center;transition:opacity .6s}
+  #splash .logo{width:92px;height:92px;border-radius:28px;background:#d3e3fd;display:flex;align-items:center;
+          justify-content:center;animation:pop .8s ease}
+  #splash .logo .ms{font-size:52px;color:#0b57d0;font-variation-settings:'FILL' 1}
+  #splash h1{margin-top:22px;font-size:36px;font-weight:700;letter-spacing:.5px;color:#0b57d0;animation:fade 1.2s ease}
+  @keyframes pop{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+  @keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+  @keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  /* profile chooser */
+  #profiles{position:absolute;inset:0;background:#fff;z-index:60;padding:48px 20px 20px;overflow-y:auto}
+  #profiles h2{font-size:26px;font-weight:500;margin-bottom:6px}
+  #profiles p{color:#444746;font-size:14px;margin-bottom:22px}
+  /* layout */
+  .screen{position:absolute;top:0;left:0;right:0;bottom:80px;overflow-y:auto;padding:16px 16px 90px;display:none;scroll-behavior:smooth}
+  .screen.on{display:block;animation:up .25s ease}
+  .top{display:flex;align-items:center;gap:6px;margin-bottom:18px}
+  .pill{flex:1;display:flex;align-items:center;gap:12px;background:#f0f4f9;border-radius:28px;padding:8px 16px 8px 8px;min-width:0}
+  .avatar{width:40px;height:40px;border-radius:50%;background:#0b57d0;color:#fff;display:flex;flex:none;
+          align-items:center;justify-content:center;font-weight:500;font-size:18px}
+  .pill div.t2{min-width:0}
+  .pill b{font-weight:500;font-size:15px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pill small{color:#444746;font-size:12px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  h2{font-size:22px;font-weight:400;margin:6px 0 12px}
+  .next{background:#d3e3fd;border-radius:28px;padding:20px;margin-bottom:20px}
+  .next .lbl{font-size:12px;letter-spacing:.8px;color:#041e49;font-weight:500}
+  .next .tm{font-size:40px;margin:6px 0 2px;color:#041e49}
+  .next .n{font-size:18px;color:#041e49}.next .d{font-size:14px;color:#444746;margin-bottom:14px}
+  .btn{border:none;border-radius:20px;padding:10px 24px;font:500 14px 'Google Sans',Roboto;cursor:pointer;
+       background:#0b57d0;color:#fff;transition:transform .1s,box-shadow .2s}
+  .btn:active{transform:scale(.96)}
+  .btn.t{background:none;color:#0b57d0;padding:10px 12px}
+  .btn.wide{width:100%;padding:14px;border-radius:24px;margin-top:8px}
+  .card{display:flex;align-items:center;gap:14px;background:#f8fafd;border:1px solid #e1e3e1;border-radius:16px;
+        padding:12px 14px;margin-bottom:10px;animation:up .25s ease;transition:opacity .2s}
+  .card .ic{width:42px;height:42px;border-radius:12px;background:#c4eed0;color:#0a3818;display:flex;flex:none;align-items:center;justify-content:center}
+  .card .m{flex:1;min-width:0}.card .m b{font-weight:500;font-size:15px;display:block}.card .m small{color:#444746;font-size:13px;display:block}
+  .card.done{opacity:.55}.card.done .m b{text-decoration:line-through}
+  .tag{background:#ffefc2;color:#5b4300;border-radius:8px;font-size:11px;padding:2px 8px;margin-left:6px;font-weight:400}
+  .iconbtn{background:none;border:none;cursor:pointer;color:#444746;padding:6px;border-radius:50%;flex:none;transition:background .15s,transform .1s}
+  .iconbtn:hover{background:#e9eef6}.iconbtn:active{transform:scale(.9)}
+  .bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .bar h2{margin:0}
+  .progress{height:8px;background:#e1e3e1;border-radius:4px;margin:0 0 16px;overflow:hidden}
+  .progress div{height:100%;background:#34a853;width:0;transition:width .4s}
+  .banner{background:#ffefc2;color:#3b2f00;border-radius:16px;padding:14px 16px;margin-bottom:14px;font-size:14px}
+  .banner .btn{margin-top:10px;padding:8px 18px;background:#3b2f00}
+  .fab{position:absolute;right:18px;bottom:98px;background:#c2e7ff;color:#001d35;border:none;border-radius:16px;
+       height:56px;padding:0 18px;display:flex;align-items:center;gap:8px;font:500 15px 'Google Sans',Roboto;
+       cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:5;transition:transform .1s}
+  .fab:active{transform:scale(.95)}
+  /* bottom nav */
+  nav{position:absolute;left:0;right:0;bottom:0;height:80px;background:#f0f4f9;display:flex;justify-content:space-around;
+      align-items:center;z-index:10}
+  nav button{background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:4px;
+      font:500 12px 'Google Sans',Roboto;color:#444746;cursor:pointer;width:90px}
+  nav .ind{width:64px;height:32px;border-radius:16px;display:flex;align-items:center;justify-content:center;transition:background .25s}
+  nav button.on{color:#1f1f1f}nav button.on .ind{background:#d3e3fd}
+  nav button.on .ms{font-variation-settings:'FILL' 1}
+  /* calendar */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+  .grid .dow{font-size:12px;color:#444746;padding:6px 0}
+  .day{aspect-ratio:1;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+       font-size:14px;cursor:pointer;position:relative;transition:background .15s}
+  .day:hover{background:#e9eef6}
+  .day.has::after{content:'';width:5px;height:5px;border-radius:50%;background:#0b57d0;position:absolute;bottom:5px}
+  .day.today{border:1px solid #0b57d0}
+  .day.sel{background:#0b57d0;color:#fff}.day.sel::after{background:#fff}
+  .sub{color:#444746;font-size:13px;margin:14px 0 10px}
+  /* dialogs */
+  .scrim{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:70;display:none;align-items:center;justify-content:center}
+  .scrim.on{display:flex;animation:fade .2s ease}
+  .dialog{background:#fff;border-radius:28px;padding:24px;width:min(330px,94%);max-height:92%;overflow-y:auto}
+  .dialog h3{font-size:22px;font-weight:400;margin-bottom:16px}
+  .field{display:block;margin-bottom:12px}
+  .field span{font-size:12px;color:#444746;display:block;margin-bottom:4px}
+  .field input{width:100%;border:1px solid #747775;border-radius:8px;padding:12px;font:15px 'Google Sans',Roboto}
+  .field input:focus{outline:2px solid #0b57d0;border-color:#0b57d0}
+  .row2{display:flex;gap:10px}.row2 .field{flex:1}
+  .err{color:#b3261e;font-size:13px;min-height:18px}
+  .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+  #toast{position:absolute;left:16px;right:16px;bottom:96px;background:#2e3132;color:#f0f0f0;border-radius:8px;
+         padding:14px 16px;font-size:14px;z-index:110;display:none;align-items:center;justify-content:space-between;gap:10px}
+  #toast button{background:none;border:none;color:#a8c7fa;font:500 14px 'Google Sans',Roboto;cursor:pointer}
+  .scan{text-align:center;padding:40px 0;color:#444746}
+  .spin{width:40px;height:40px;border:4px solid #d3e3fd;border-top-color:#0b57d0;border-radius:50%;
+        animation:sp 1s linear infinite;margin:0 auto 14px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .empty{text-align:center;color:#747775;padding:30px 10px;font-size:14px}
+  /* side drawer */
+  #dscrim{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:40;display:none}
+  #drawer{position:absolute;top:0;bottom:0;left:0;width:290px;background:#f8fafd;z-index:41;padding:36px 14px 16px;
+          transform:translateX(-100%);transition:transform .25s;overflow-y:auto;border-radius:0 24px 24px 0}
+  #drawer.on{transform:none}
+  #drawer .cur{background:#d3e3fd;border-radius:20px;padding:16px;margin-bottom:16px}
+  #drawer .cur .avatar{width:52px;height:52px;font-size:22px;margin-bottom:10px}
+  #drawer .cur b{display:block;font-weight:500;font-size:17px;color:#041e49}
+  #drawer .cur small{color:#444746;font-size:13px;word-break:break-all}
+  #drawer h4{font-size:12px;color:#444746;font-weight:500;margin:14px 8px 6px;letter-spacing:.6px}
+  .item{display:flex;align-items:center;gap:14px;padding:12px;border-radius:24px;cursor:pointer;font-size:14px;font-weight:500}
+  .item:hover{background:#e9eef6}.item.on{background:#d3e3fd}
+  .item .avatar{width:32px;height:32px;font-size:14px}
+  .item.red{color:#b3261e}
+  /* incoming-call style reminder */
+  #ring{position:absolute;inset:0;z-index:100;background:linear-gradient(#10243f,#0a1626);color:#fff;display:none;
+        flex-direction:column;align-items:center;padding:70px 24px 50px;text-align:center}
+  #ring.on{display:flex;animation:fade .3s ease}
+  #ring .r-top{font-size:14px;letter-spacing:1.5px;color:#a8c7fa;margin-bottom:26px}
+  #ring .r-av{width:110px;height:110px;border-radius:50%;background:#0b57d0;display:flex;align-items:center;justify-content:center;
+        position:relative;margin-bottom:26px}
+  #ring .r-av .ms{font-size:56px;font-variation-settings:'FILL' 1}
+  #ring:not(.quiet) .r-av::before,#ring:not(.quiet) .r-av::after{content:'';position:absolute;inset:0;border-radius:50%;
+        border:2px solid #4c8df6;animation:pulse 1.8s infinite}
+  #ring .r-av::after{animation-delay:.9s}
+  @keyframes pulse{from{transform:scale(1);opacity:.9}to{transform:scale(1.9);opacity:0}}
+  #ring .r-time{font-size:44px;font-weight:500;margin-bottom:4px}
+  #ring .r-who{color:#a8c7fa;font-size:15px;margin-bottom:22px}
+  #ring .r-list{flex:1;width:100%;overflow-y:auto}
+  #ring .r-item{background:rgba(255,255,255,.1);border-radius:16px;padding:12px 16px;margin-bottom:8px;text-align:left}
+  #ring .r-item b{display:block;font-weight:500;font-size:17px}#ring .r-item small{color:#c4c7c5;font-size:13px}
+  #ring .r-btns{display:flex;gap:56px;margin-top:16px}
+  .rb{border:none;background:none;color:#fff;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;font-size:13px}
+  .rb .ms{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px}
+  .rb.green .ms{background:#1e8e3e}.rb.red .ms{background:#c5221f}
+  .rb:active .ms{transform:scale(.92)}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* onboarding (right after first sign-up) */
+  #onboard{position:absolute;inset:0;background:#fff;z-index:65;display:none;flex-direction:column;justify-content:center;padding:28px;overflow-y:auto}
+  #onboard .logo{width:72px;height:72px;border-radius:22px;background:#c4eed0;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+  #onboard .logo .ms{font-size:40px;color:#0a3818;font-variation-settings:'FILL' 1}
+  #onboard h1{font-size:26px;font-weight:400;margin-bottom:6px}
+  #onboard p.lead{color:#444746;font-size:14px;margin-bottom:16px}
+  #onboard .step{display:flex;gap:12px;align-items:flex-start;background:#f8fafd;border:1px solid #e1e3e1;border-radius:16px;padding:12px 14px;margin-bottom:8px}
+  #onboard .step .n{width:28px;height:28px;border-radius:50%;background:#d3e3fd;color:#041e49;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:14px;flex-shrink:0}
+  #onboard .step b{font-weight:500;font-size:15px;display:block}
+  #onboard .step small{color:#444746;font-size:13px}
+  #onboard .btn{width:100%;padding:14px;font-size:15px;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:8px}
+  #onboard .btn.alt{background:#d3e3fd;color:#041e49}
+  #onboard .btn.t{background:none;color:#0b57d0}
+  /* ---- new home screen ---- */
+  #s-home{padding:0 0 24px}
+  .hero{background:linear-gradient(135deg,#0b57d0 0%,#4285f4 60%,#7cacf8 100%);color:#fff;padding:26px 20px 70px;border-radius:0 0 32px 32px}
+  .hero .top{display:flex;justify-content:space-between;align-items:center}
+  .hero .greet{font-size:13px;opacity:.9}
+  .hero h1{font-size:25px;font-weight:500;margin:2px 0 0}
+  .hero .mail{font-size:12px;opacity:.8}
+  .hero .avatar{width:48px;height:48px;background:rgba(255,255,255,.25);font-size:20px;border:2px solid rgba(255,255,255,.6)}
+  .hero .date{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.18);border-radius:14px;padding:5px 12px;font-size:12px;margin-top:12px}
+  .hero .date .ms{font-size:16px}
+  .hprog{height:8px;background:rgba(255,255,255,.3);border-radius:4px;margin-top:16px;overflow:hidden}
+  .hprog div{height:100%;background:#fff;width:0;transition:width .4s}
+  .plabel{font-size:12px;opacity:.9;margin-top:6px}
+  .hbody{padding:0 16px}
+  .ncard{background:#fff;border-radius:24px;padding:18px 20px;margin:-48px 16px 0;box-shadow:0 6px 20px rgba(11,87,208,.18);position:relative}
+  .ncard .nrow{display:flex;justify-content:space-between;align-items:flex-start}
+  .ncard .lbl{font-size:11px;letter-spacing:.9px;color:#0b57d0;font-weight:500}
+  .ncard .t{font-size:38px;font-weight:500;margin-top:2px;color:#1f1f1f}
+  .ncard .n{font-size:18px;font-weight:500;margin-top:4px}
+  .ncard .d{font-size:14px;color:#444746;margin:2px 0 14px}
+  .chip{background:#d3e3fd;color:#041e49;border-radius:12px;font-size:12px;padding:5px 10px;font-weight:500}
+  .chip.over{background:#ffdad6;color:#601410}
+  .btn.big{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;font-size:15px;border-radius:16px}
+  .ncard.ok{background:linear-gradient(135deg,#c4eed0,#e6f6ea)}
+  .ncard.ok .t{font-size:24px;line-height:1.3}
+  .stats{display:flex;gap:10px;margin:16px 16px 0}
+  .tile{flex:1;border-radius:18px;padding:12px 6px;text-align:center}
+  .tile b{font-size:24px;font-weight:500;display:block}
+  .tile small{font-size:12px}
+  .tile.a{background:#c4eed0;color:#0a3818}.tile.b{background:#ffefc2;color:#5b4300}.tile.c{background:#d3e3fd;color:#041e49}
+  .quick{display:flex;gap:10px;margin:14px 16px 0}
+  .quick button{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid #c7c7c7;background:#fff;
+      border-radius:16px;padding:11px 6px;font:500 13px 'Google Sans',Roboto;color:#0b57d0;cursor:pointer}
+  .quick button:hover{background:#f0f4f9}
+  .sec{display:flex;align-items:center;gap:8px;margin:20px 16px 8px;font-size:15px;font-weight:500;color:#444746}
+  .sec .ms{font-size:20px;color:#0b57d0}
+  /* ---- shared redesign for Timetable + Calendar ---- */
+  #s-time,#s-cal{padding:0 0 24px}
+  .hero.sm{padding-bottom:58px}
+  .herobtn{width:48px;height:48px;border-radius:50%;border:2px solid rgba(255,255,255,.6);background:rgba(255,255,255,.25);
+           color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .herobtn .ms{font-size:24px}
+  .tip{display:flex;gap:12px;align-items:flex-start;background:#fff;border-radius:20px;padding:14px 16px;margin:-34px 16px 0;
+       box-shadow:0 6px 20px rgba(11,87,208,.18);font-size:13px;color:#444746;position:relative}
+  .tip .ms{color:#0b57d0;font-size:22px;flex-shrink:0}
+  .calcard{background:#fff;border-radius:24px;padding:14px 12px 16px;margin:-34px 16px 0;box-shadow:0 6px 20px rgba(11,87,208,.18);position:relative}
+  .calcard .cal-head h2{font-size:18px;font-weight:500}
+  .day.sel{background:linear-gradient(135deg,#0b57d0,#4285f4);box-shadow:0 2px 6px rgba(11,87,208,.35)}
+  .dayt{margin-top:18px}
+  nav{background:#fff;box-shadow:0 -2px 14px rgba(0,0,0,.08)}
+  /* ---- v4 extras ---- */
+  .hero .top{gap:12px;margin-bottom:0}
+  .hero .who{flex:1;min-width:0}
+  .hero h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hero .herobtn{flex:none}
+  .tag.red{background:#ffdad6;color:#601410}
+  .tile.d{background:#ffdad6;color:#601410}
+  #reviewbar .banner{margin:12px 16px 0}
+  #warn{margin:12px 16px 0}
+  .chk{display:flex;align-items:center;gap:10px;margin:0 0 12px;font-size:14px;cursor:pointer}
+  .chk input{width:20px;height:20px}
+  .field textarea{width:100%;border:1px solid #747775;border-radius:8px;padding:10px;font:12px monospace;resize:vertical}
+  #s-time{padding-bottom:96px}
+  a.iconbtn{text-decoration:none;display:inline-flex;align-items:center}
+  .hint{font-size:12px;color:#747775;margin:-6px 0 12px}
+  /* bigger text, easier to read */
+  .sub{font-size:14px}.card .m small{font-size:14px}.tag{font-size:12px}nav button{font-size:13px}
+  .tile small{font-size:13px}.empty{font-size:15px}.iconbtn{padding:8px}
+  @media (max-width:430px){body{padding:0}.phone{max-width:none;border-width:0;border-radius:0}}
+  /* ================= ANDROID 17 - MATERIAL 3 EXPRESSIVE =================
+     Bold type, very round shapes, connected list groups like Android Settings,
+     a wavy progress line and springy motion. Flat colours (no blur), so it stays fast. */
+  :root{--prim:#0b57d0;--cont:#d3e3fd;--oncont:#001d4a;--tert:#ffd8e4;--ontert:#31111d;--surf:#f8fafd;--grp:#e9eef6;--txt:#1b1c1f;--txt2:#44474e;--spring:cubic-bezier(.34,1.56,.64,1)}
+  body{background:#e1e3e8}
+  .phone,#profiles,#onboard,#splash{background:var(--surf)}
+  .screen{bottom:80px;overscroll-behavior:contain}
+  .screen.on{animation:settle .4s var(--spring)}
+  @keyframes settle{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+  @keyframes pop{0%{transform:scaleX(.6)}100%{transform:none}}
+  .card{animation:none}
+  #s-home,#s-time,#s-cal{padding-bottom:24px}
+  #s-time{padding-bottom:104px}
+  /* large top bar */
+  .hero,.hero.sm{background:none;color:var(--txt);border-radius:0;padding:10px 16px 6px}
+  .appbar{display:flex;align-items:center;gap:6px;height:56px}
+  .appbar.plain{margin:0 -4px 6px}
+  .herobtn{background:var(--grp);border:none;box-shadow:none;color:var(--txt);width:48px;height:48px;flex:none;transition:transform .35s var(--spring),border-radius .2s}
+  .herobtn:hover{background:var(--cont)}
+  .herobtn:active{transform:scale(.9);border-radius:16px}
+  .appbar .apptitle{flex:1;font-size:22px;font-weight:600;color:var(--txt);padding-left:6px}
+  #s-home .appbar .apptitle{color:var(--prim)}
+  .appbar .avatar{width:48px;height:48px;border-radius:38%;font-size:20px;font-weight:600;border:none;background:var(--tert);color:var(--ontert);box-shadow:none}
+  .hero .greet{font-size:16px;font-weight:500;color:var(--prim);opacity:1}
+  .hero h1{font-size:40px;font-weight:500;line-height:1.1;letter-spacing:-.5px;color:var(--txt);margin:2px 0 4px}
+  .hero .mail{font-size:14px;color:var(--txt2);opacity:1}
+  .hero .date{background:none;border:none;box-shadow:none;padding:0;margin-top:8px;color:var(--txt2);font-size:15px}
+  .hero .date .ms{font-size:18px}
+  /* Home profile identity card */
+  #s-home .hero{background:linear-gradient(135deg,#eaf5ff 0%,#d9edff 100%);color:#12395b;
+    border:1px solid #c6e2fa;border-radius:26px;margin:10px 12px 16px;padding:22px 20px 24px;
+    box-shadow:0 8px 22px rgba(55,125,185,.10)}
+  #s-home .hero .greet{color:#28618d;font-size:16px;font-weight:600;opacity:1;margin-top:12px}
+  #s-home .hero h1{color:#12395b;font-size:36px;font-weight:700;line-height:1.12;margin:6px 0 4px;overflow-wrap:anywhere}
+  #s-home .hero .date{display:inline-flex;background:rgba(255,255,255,.72);border:1px solid #c6e2fa;
+    border-radius:14px;padding:9px 12px;margin-top:14px;color:#315d7d;font-size:14px}
+  #s-home .hero .date .ms{color:#2877b9}
+  .m-mark{width:52px;height:52px;border-radius:17px;display:inline-flex;align-items:center;justify-content:center;
+    background:linear-gradient(145deg,#e5f4ff,#b9ddfa);border:1px solid #a8d1f2;color:#1769a6;
+    font-family:'Google Sans',Roboto,Arial,sans-serif;font-size:31px;font-weight:800;letter-spacing:-2px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 5px 14px rgba(33,112,175,.16)}
+  #splash .logo{background:transparent;box-shadow:none}
+  #splash .logo .m-mark{width:92px;height:92px;border-radius:28px;font-size:56px}
+  /* wavy progress line (signature Expressive element) */
+  .hprog{height:14px;margin-top:16px;border-radius:0;background:var(--cont);box-shadow:none;
+         -webkit-mask-image:url('data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="28" height="14" viewBox="0 0 28 14"%3E%3Cpath d="M0 7 Q7 0 14 7 T28 7" fill="none" stroke="black" stroke-width="4" stroke-linecap="round"/%3E%3C/svg%3E');mask-image:url('data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="28" height="14" viewBox="0 0 28 14"%3E%3Cpath d="M0 7 Q7 0 14 7 T28 7" fill="none" stroke="black" stroke-width="4" stroke-linecap="round"/%3E%3C/svg%3E');-webkit-mask-size:28px 14px;mask-size:28px 14px;-webkit-mask-repeat:repeat-x;mask-repeat:repeat-x}
+  .hprog div{background:var(--prim)}
+  .plabel{font-size:13px;font-weight:500;color:var(--txt2);opacity:1}
+  /* next medicine: bold colour block */
+  .ncard{background:var(--prim);color:#fff;border:none;box-shadow:none;border-radius:40px;margin:16px 16px 0;padding:24px}
+  .ncard .lbl{color:#d3e3fd;font-weight:600;letter-spacing:1px}
+  .ncard .t{color:#fff;font-size:56px;font-weight:500;letter-spacing:-1px;line-height:1.05}
+  .ncard .n{color:#fff;font-size:22px;font-weight:600}.ncard .d{color:#d3e3fd;font-size:15px}
+  .ncard .chip{background:#fff;color:var(--prim);font-weight:600;padding:6px 12px;border-radius:14px}
+  .ncard .chip.over{background:#ffdad6;color:#601410}
+  .ncard .btn.big{background:#fff;color:var(--prim)}
+  .ncard.ok{background:#c4eed0;color:#0a3818}.ncard.ok .lbl,.ncard.ok .t{color:#0a3818}
+  .btn{background:var(--prim);color:#fff;box-shadow:none;transition:transform .35s var(--spring),border-radius .2s}
+  .btn:active{transform:scale(.95);border-radius:14px}
+  .btn.big{border-radius:28px;height:56px;padding:0 16px;font-size:16px;font-weight:600}
+  /* stats and quick buttons */
+  .stats{gap:8px}
+  .tile,.tile.a,.tile.b,.tile.c,.tile.d{border:none;box-shadow:none;border-radius:28px;padding:16px 6px}
+  .tile.a{background:#c4eed0;color:#0a3818}.tile.b{background:var(--cont);color:var(--oncont)}
+  .tile.c{background:var(--grp);color:var(--txt)}.tile.d{background:#ffdad6;color:#601410}
+  .tile b{font-size:34px;font-weight:500;line-height:1}.tile small{font-weight:500}
+  .quick{margin:12px 16px 0;gap:8px}
+  .quick button{background:var(--cont);color:var(--oncont);border:none;box-shadow:none;border-radius:28px;height:56px;padding:0 12px;font:600 14px 'Google Sans',Roboto;transition:transform .35s var(--spring),border-radius .2s}
+  .quick button:last-child{background:var(--tert);color:var(--ontert)}
+  .quick button:hover{background:var(--cont)}.quick button:last-child:hover{background:var(--tert)}
+  .quick button:active{transform:scale(.95);border-radius:16px}
+  .quick button .ms{color:inherit;font-size:20px}
+  /* connected list groups, like Android Settings */
+  .sec{font-size:15px;font-weight:600;color:var(--txt2);margin:24px 20px 8px}
+  .sec .ms{color:var(--prim)}
+  .card{background:var(--grp);border:none;box-shadow:none;border-radius:24px}
+  .hbody .card{border-radius:8px;margin:0 0 3px}
+  .hbody .card:first-child{border-radius:28px 28px 8px 8px}
+  .hbody .card:last-child{border-radius:8px 8px 28px 28px;margin-bottom:0}
+  .hbody .card:only-child{border-radius:28px}
+  .card .ic{background:var(--cont);color:var(--prim);border-radius:36%;width:48px;height:48px}
+  .card .m b{font-weight:600}
+  .tip{background:var(--grp);border:none;box-shadow:none;border-radius:28px;margin:8px 16px 0}
+  .banner{background:#ffefc2;border:none;box-shadow:none;border-radius:28px}
+  /* navigation bar and floating button */
+  nav{left:0;right:0;bottom:0;height:80px;border-radius:0;background:var(--grp);-webkit-backdrop-filter:none;backdrop-filter:none;border:none;box-shadow:none;transform:none}
+  nav button{width:auto;flex:1}
+  nav .ind{width:64px;height:32px}
+  nav button.on .ind{background:var(--cont);box-shadow:none;animation:pop .45s var(--spring)}
+  nav button.on{font-weight:600}
+  .fab{background:var(--tert);color:var(--ontert);border:none;border-radius:20px;height:64px;padding:0 22px 0 18px;font-weight:600;box-shadow:0 2px 6px rgba(0,0,0,.2);transition:transform .35s var(--spring),border-radius .2s}
+  .fab:active{transform:scale(.94);border-radius:28px}
+  #toast{bottom:96px;border-radius:16px}
+  /* calendar */
+  .calcard{background:none;border:none;box-shadow:none;padding:0 4px;margin:4px 8px 0}
+  .calcard .cal-head h2{font-size:24px;font-weight:500}
+  .day{transition:transform .3s var(--spring)}.day:active{transform:scale(.85)}
+  .day.today{border:none;background:none;color:var(--prim);font-weight:700;box-shadow:inset 0 0 0 2px var(--prim)}.day.today::after{background:var(--prim)}
+  .day.sel,.day.today.sel{background:var(--prim);color:#fff;box-shadow:none}.day.sel::after,.day.today.sel::after{background:#fff}
+  /* dialogs, drawer, onboarding */
+  .dialog{background:var(--surf);border:none;border-radius:32px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #drawer{background:var(--surf);border-right:none;border-radius:0 32px 32px 0}
+  #drawer .cur{background:var(--cont);border:none;box-shadow:none;border-radius:28px}
+  .item{border-radius:28px}
+  #onboard .logo{border-radius:36%}
+  #onboard .step{background:var(--grp);border:none;box-shadow:none;border-radius:24px}
+  #onboard .btn.alt{background:var(--cont);color:var(--oncont);border:none;box-shadow:none}
+  .field input{border-radius:12px}
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  /* ================= ANDROID APP LOOK (no phone frame) ================= */
+  :root{--surf:#fff;--grp:#f0f4f9;--tert:#c2e7ff;--ontert:#001d35}
+  body{background:#fff;padding:0}
+  .phone,#profiles,#onboard,#splash{background:#fff}
+  .phone{max-width:460px;width:100%;margin:0 auto;height:780px;border:none;border-radius:0;box-shadow:none;aspect-ratio:auto}
+  @media (min-width:600px){body{background:#f1f3f4;padding:12px}.phone{border-radius:28px;box-shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15)}}
+  .screen{top:0;bottom:80px}
+  nav{height:80px;padding-bottom:0;background:var(--grp)}
+  .fab{bottom:98px;background:var(--tert);color:var(--ontert)}
+  #toast{bottom:96px}
+  .hero,.hero.sm{padding-top:16px}
+  /* minimal Google look */
+  .hero .mail{display:none}
+  .herobtn{background:none}.herobtn:hover{background:var(--grp)}
+  .appbar .apptitle{font-weight:500}
+  .appbar .avatar{border-radius:50%;background:var(--prim);color:#fff;width:40px;height:40px;font-size:18px;font-weight:500}
+  #av{border:0;cursor:pointer;flex:none;transition:transform .15s,box-shadow .15s}
+  #av:hover{box-shadow:0 0 0 4px #d3e3fd}
+  #av:active{transform:scale(.94)}
+  #av:focus-visible{outline:3px solid #7cacf8;outline-offset:3px}
+  /* profile details opened from the blue initials button */
+  #profile-view{position:absolute;inset:0;z-index:66;background:#fff;display:none;overflow-y:auto;padding:16px 16px 30px}
+  #profile-view.on{display:block;animation:up .25s ease}
+  .profile-toolbar{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+  .profile-toolbar h2{font-size:22px;font-weight:500;margin:0;flex:1}
+  .profile-back{width:42px;height:42px;border:0;border-radius:50%;background:#f0f4f9;color:#1f1f1f;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .profile-identity{display:flex;align-items:center;gap:14px;background:#d3e3fd;border-radius:26px;padding:18px;margin-bottom:16px}
+  .profile-identity .avatar{width:64px;height:64px;font-size:26px;flex:none}
+  .profile-identity h3{font-size:22px;font-weight:500;overflow-wrap:anywhere}
+  .profile-identity p{font-size:13px;color:#33445f;margin-top:3px}
+  .profile-section{background:#f0f4f9;border-radius:24px;padding:16px;margin:12px 0}
+  .profile-section h3{font-size:16px;font-weight:600;margin:0 0 12px;color:#1f1f1f}
+  .profile-data{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .profile-data .datum{min-width:0;background:#fff;border-radius:16px;padding:12px}
+  .profile-data .datum small{display:block;font-size:12px;color:#5f6368;margin-bottom:5px}
+  .profile-data .datum b{font-size:15px;font-weight:500;overflow-wrap:anywhere;display:block}
+  .profile-note{font-size:12px;line-height:1.5;color:#5f6368;margin-top:10px}
+  .profile-med{background:#fff;border-radius:14px;padding:12px;margin-top:8px}
+  .profile-med b{font-size:14px;font-weight:600;display:block;overflow-wrap:anywhere}
+  .profile-med small{font-size:12px;color:#5f6368;display:block;margin-top:4px;line-height:1.4}
+  .profile-routine{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .profile-routine div{background:#fff;padding:10px 12px;border-radius:12px;font-size:13px;display:flex;justify-content:space-between;gap:8px}
+  .profile-routine b{font-weight:500}
+  .profile-empty{font-size:13px;color:#5f6368;background:#fff;padding:14px;border-radius:14px}
+  .hero .greet{font-size:14px;font-weight:400;color:var(--txt2)}
+  .hero h1{font-size:32px;font-weight:400;letter-spacing:0}
+  .hero .date{margin-top:4px}
+  .plabel{margin-top:2px}
+  .ncard{background:var(--cont);color:var(--oncont);border-radius:28px;padding:20px;margin:18px 16px 0}
+  .ncard .lbl{color:var(--prim)}
+  .ncard .t{color:var(--oncont);font-size:44px;font-weight:400;letter-spacing:0}
+  .ncard .n{color:var(--oncont);font-size:18px;font-weight:500}.ncard .d{color:var(--txt2)}
+  .ncard .chip{background:#fff;color:var(--oncont);font-weight:500}
+  .ncard .btn.big{background:var(--prim);color:#fff;height:48px;font-size:15px;border-radius:24px}
+  .ncard.ok{background:#c4eed0}
+  .sec{font-size:14px;font-weight:500;margin:22px 20px 6px}
+  .card .ic{border-radius:50%;width:44px;height:44px}
+  .card .m b{font-weight:500}
+  .tip{background:none;padding:6px 20px 0;margin:0;font-size:13px}
+  .scard{display:flex;align-items:center;gap:16px;background:var(--grp);border-radius:28px;margin:14px 16px 0;padding:16px 18px}
+  .scard .ring{position:relative;width:116px;height:116px;flex:none}
+  .scard .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .scard .num b{font-size:34px;font-weight:500;line-height:1}.scard .num small{font-size:12px;color:var(--txt2)}
+  .stitle{font-size:18px;font-weight:500}.ssub{font-size:13px;color:var(--txt2);margin:2px 0 10px}
+  .streak{display:inline-block;background:#fff;border-radius:16px;padding:6px 12px;font-size:14px;font-weight:500}
+  .best{font-size:12px;color:var(--txt2);margin-top:6px}
+  .bcard{display:flex;align-items:center;gap:14px;background:#fef7e0;color:#3c2e00;border-radius:28px;margin:14px 16px 0;padding:16px}
+  .bnum{width:64px;height:64px;border-radius:50%;background:#fbbc04;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:none}
+  .bnum b{font-size:26px;font-weight:500;line-height:1}.bnum small{font-size:11px;font-weight:500}
+  .bt1{font-size:16px;font-weight:500}.bt2{font-size:14px;margin-top:3px}
+  .terms{max-height:340px;overflow:auto;font-size:14px;line-height:1.5;color:var(--txt2)}.terms p{margin:0 0 10px}
+  .chk a{color:var(--prim)}
+  .profile-toolbar .btn{padding:10px 16px;border-radius:18px;white-space:nowrap}
+  #rxscrim .dialog{width:min(440px,96%)}
+  #rx-text{width:100%;min-height:190px;max-height:36vh;border:1px solid #c5c9d0;border-radius:14px;padding:12px;font:14px/1.5 Roboto,Arial,sans-serif;resize:vertical;background:#fff;color:#202124}
+  .rx-status{font-size:13px;color:#3c4043;margin:0 0 10px;line-height:1.45}
+  .rx-note{background:#fff3cd;border-radius:14px;padding:12px;font-size:12px;line-height:1.5;color:#5b4300;margin:10px 0}
+  .alert-setting{background:#f0f4f9;border-radius:16px;padding:12px;margin:10px 0}
+  .alert-setting input[type=range]{width:100%;accent-color:var(--prim)}
+  .alert-setting .hint{margin:6px 0 0}
+  #app-error{position:absolute;inset:0;z-index:150;background:#fff;display:none;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:28px;gap:12px}
+  #app-error.on{display:flex}
+  #app-error h2{font-size:24px;font-weight:500;margin:0}
+  #app-error p{font-size:14px;color:#5f6368;line-height:1.5;max-width:320px}
+  #app-error .btn{min-width:160px}
+  .app-subtle{font-size:12px;color:#5f6368;line-height:1.45}
+  .screen,#profile-view{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #7cacf8;outline-offset:2px}
+  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+
+  /* ================= v5 edits ================= */
+  html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+  body{-webkit-font-smoothing:antialiased;font-family:'Google Sans','Product Sans',Roboto,Arial,sans-serif}
+  /* home: white app bar, blue card underneath */
+  #s-home>.appbar{margin:0;padding:10px 16px 0;background:#fff}
+  #s-home .hero{margin-top:4px}
+  #s-home .hero .greet{margin-top:0}
+  /* logo */
+  .m-logo{width:72px;height:72px;display:block}
+  #splash .logo .m-logo{width:96px;height:96px;filter:drop-shadow(0 4px 12px rgba(11,87,208,.18))}
+  #onboard .logo{background:none;width:72px;height:72px}
+  /* white Android-style reminder screen */
+  #ring{background:#fff;color:#1f1f1f;padding:64px 20px 28px}
+  #ring .r-top{color:#0b57d0;font-weight:500;font-size:13px}
+  #ring .r-av{background:#d3e3fd;color:#0b57d0}
+  #ring:not(.quiet) .r-av::before,#ring:not(.quiet) .r-av::after{border-color:#a8c7fa}
+  #ring .r-time{color:#1f1f1f}
+  #ring .r-who{color:#444746}
+  #ring .r-item{background:#f0f4f9}
+  #ring .r-item small{color:#444746}
+  #ring .r-btns{gap:12px;width:100%;margin-top:14px}
+  #ring .rb{flex:1;flex-direction:row;justify-content:center;height:52px;border-radius:26px;gap:8px;font:500 15px 'Google Sans',Roboto,Arial,sans-serif;transition:transform .2s}
+  #ring .rb .ms{width:auto;height:auto;background:none;font-size:22px;border-radius:0}
+  #ring .rb.red{background:#e8f0fe;color:#0b57d0}
+  #ring .rb.green{background:#0b57d0;color:#fff}
+  #ring .rb:active{transform:scale(.96)}
+  /* spoken-alert switch in profile details */
+  .switchrow{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;border-radius:16px;padding:12px 14px;cursor:pointer}
+  .switchrow b{font-weight:500;font-size:15px;display:block}
+  .switchrow small{font-size:12px;color:#5f6368;display:block;margin-top:2px}
+  .switchrow input{-webkit-appearance:none;appearance:none;width:52px;height:32px;border-radius:16px;background:#e1e3e1;border:2px solid #747775;position:relative;flex:none;cursor:pointer;transition:background .2s,border-color .2s}
+  .switchrow input::after{content:'';position:absolute;top:6px;left:6px;width:16px;height:16px;border-radius:50%;background:#747775;transition:all .2s}
+  .switchrow input:checked{background:#0b57d0;border-color:#0b57d0}
+  .switchrow input:checked::after{top:2px;left:20px;width:24px;height:24px;background:#fff}
+  /* full screen when running as an app */
+  @media (max-width:600px){html,body{height:100%}.phone{height:100vh;height:100dvh;max-width:none;border-radius:0}}
+  .btn,.item,.card,.iconbtn,.herobtn{transition:transform .2s,background .2s,box-shadow .2s,border-radius .2s}
+</style>
+
+<div class="phone">
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <linearGradient id="mlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6f0ff"/><stop offset="1" stop-color="#aecbfa"/></linearGradient>
+    <symbol id="mlogo" viewBox="0 0 100 100"><rect width="100" height="100" rx="30" fill="url(#mlg)"/><path d="M27 69V43M27 52C27 43 33 38 40 38C47 38 50 44 50 52V69M50 52C50 43 56 38 63 38C70 38 73 44 73 52V69" fill="none" stroke="#0b57d0" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs></svg>
+  <div id="splash">
+    <div class="logo"><svg class="m-logo" viewBox="0 0 100 100" role="img" aria-label="MediMate"><use href="#mlogo"/></svg></div>
+    <h1 id="appname"></h1>
+  </div>
+
+  <!-- PROFILE CHOOSER -->
+  <div id="profiles">
+    <h2>Who is taking medicines?</h2>
+    <p>Pick a profile or add a new one.</p>
+    <div id="plist"></div>
+    <button class="btn wide" onclick="openAddProfile()"><span class="ms" style="font-size:20px">person_add</span>&nbsp; Add profile</button>
+  </div>
+
+  <!-- HOME -->
+  <div class="screen on" id="s-home">
+    <div class="appbar plain homebar">
+      <button class="herobtn" aria-label="Open menu" onclick="openDrawer()"><span class="ms">menu</span></button>
+      <div class="apptitle"></div>
+      <button type="button" class="avatar" id="av" aria-label="Open profile details" title="Profile details" onclick="openProfileDetails()"></button>
+    </div>
+    <div class="hero">
+      <div class="greet" id="greet"></div>
+      <h1 id="pname"></h1>
+      <div class="date"><span class="ms">calendar_today</span><span id="hdate"></span></div>
+    </div>
+    <div id="bday"></div>
+    <div id="nextcard"></div>
+    <div class="banner" id="warn" style="display:none">Saving is blocked in this browser, so your medicines will be lost when you close this page. Open the menu and use "Back up data" to keep a copy.</div>
+    <div id="todaylist"></div>
+  </div>
+
+  <!-- TIMETABLE -->
+  <div class="screen" id="s-time">
+    <div class="hero sm">
+      <div class="appbar plain">
+        <button class="herobtn" aria-label="Open menu" onclick="openDrawer()"><span class="ms">menu</span></button>
+        <div class="apptitle">Timetable</div>
+      </div>
+      <div class="date"><span class="ms">medication</span><span id="tcount"></span></div>
+    </div>
+    <input type="file" id="rxfile" accept="image/*" capture="environment" style="display:none" onchange="scanPrescription(this)">
+    <div class="tip"><div>Enter medicine details exactly as written on the current prescription or medicine label. A parent or guardian should check every medicine, dose, time and duration for a child. Do not guess when an instruction is unclear. Browser reminders may stop when this page is closed or suspended. For calendar alerts, the calendar icon opens a Google Calendar event.</div></div>
+    <div id="reviewbar"></div>
+    <div id="timelist"></div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="screen" id="s-cal">
+    <div class="hero sm">
+      <div class="appbar plain">
+        <button class="herobtn" aria-label="Open menu" onclick="openDrawer()"><span class="ms">menu</span></button>
+        <div class="apptitle">Calendar</div>
+      </div>
+      <div class="date"><span class="ms">touch_app</span><span>Tap a day to see its medicines</span></div>
+    </div>
+    <div class="calcard">
+      <div class="cal-head">
+        <button class="iconbtn" aria-label="Previous month" onclick="shiftMonth(-1)"><span class="ms">chevron_left</span></button>
+        <h2 id="monthname"></h2>
+        <button class="iconbtn" aria-label="Next month" onclick="shiftMonth(1)"><span class="ms">chevron_right</span></button></div>
+      <div class="grid" id="grid"></div>
+    </div>
+    <div class="sec dayt" id="daytitle"></div>
+    <div id="daylist"></div>
+  </div>
+
+  <nav id="nav">
+    <button class="on" data-s="home"><div class="ind"><span class="ms">home</span></div>Home</button>
+    <button data-s="time"><div class="ind"><span class="ms">schedule</span></div>Timetable</button>
+    <button data-s="cal"><div class="ind"><span class="ms">calendar_month</span></div>Calendar</button>
+  </nav>
+
+  <!-- DRAWER -->
+  <div id="dscrim" onclick="closeDrawer()"></div>
+  <div id="drawer">
+    <div class="cur"><div class="avatar" id="d-av"></div><b id="d-name"></b><small id="d-mail"></small></div>
+    <h4>PROFILES</h4>
+    <div id="d-list"></div>
+    <div class="item" onclick="closeDrawer();openEditProfile()"><span class="ms">manage_accounts</span>Edit this profile</div>
+    <div class="item" onclick="closeDrawer();openAddProfile()"><span class="ms">person_add</span>Add profile</div>
+    <h4>SETTINGS</h4>
+    <div class="item" onclick="openRoutine()"><span class="ms">alarm</span>Daily routine</div>
+    <div class="item" onclick="openSetPin()"><span class="ms">lock</span>PIN lock</div>
+    <div class="item" onclick="openBackup()"><span class="ms">backup</span>Back up data</div>
+    <div class="item" onclick="testRing()"><span class="ms">ring_volume</span>Test ringtone</div>
+    <div class="item" onclick="showChooser()"><span class="ms">switch_account</span>All profiles</div>
+    <div class="item red" id="d-del" onclick="deleteProfile()"><span class="ms">delete</span><span>Delete this profile</span></div>
+    <div class="item red" id="d-reset" onclick="resetApp()"><span class="ms">restart_alt</span><span>Reset app</span></div>
+  </div>
+
+  <!-- ADD PROFILE -->
+  <div class="scrim" id="pscrim"><div class="dialog">
+    <h3 id="p-title">Welcome</h3>
+    <label class="field"><span>Your name</span><input id="p-name" autocomplete="off"></label>
+    <label class="field"><span>Date of birth</span><input id="p-dob" type="date" min="1900-01-01"></label>
+    <label class="chk"><input type="checkbox" id="p-agree"><span id="p-agree-text">I have read and agree to the <a href="#" onclick="openTerms();return false">Terms and Privacy Policy</a>.</span></label>
+    <label class="chk" id="p-guardian-wrap" style="display:none"><input type="checkbox" id="p-guardian"><span>A parent or legal guardian confirms they will check this profile and supervise all medicine reminders and medicine-taking.</span></label>
+    <div class="err" id="p-err"></div>
+    <div class="acts"><button class="btn t" onclick="closeAddProfile()">Cancel</button>
+      <button class="btn" onclick="saveProfile()">Continue</button></div>
+  </div></div>
+
+  <!-- EDIT MEDICINE -->
+  <div class="scrim" id="scrim"><div class="dialog">
+    <h3 id="dtitle">Edit medicine</h3>
+    <label class="field"><span>Medicine name</span><input id="f-name" autocomplete="off"></label>
+    <label class="field"><span>Dose and instructions (copy exactly as prescribed)</span><input id="f-dose" autocomplete="off"></label>
+    <div class="row2">
+      <label class="field"><span>Time</span><input id="f-time" type="time"></label>
+      <label class="field"><span>Number of days</span><input id="f-days" type="number" min="1" max="365"></label>
+    </div>
+    <label class="chk"><input type="checkbox" id="f-ongoing"> No end date (long-term medicine)</label>
+    <div class="row2">
+      <label class="field"><span>Start date</span><input id="f-start" type="date"></label>
+      <label class="field"><span>Repeat every (days)</span><input id="f-every" type="number" min="1" max="30"></label>
+    </div>
+    <div class="err" id="f-err"></div>
+    <div class="acts"><button class="btn t" onclick="closeEdit()">Cancel</button>
+      <button class="btn" onclick="saveEdit()">Save</button></div>
+  </div></div>
+
+  <!-- DAILY ROUTINE -->
+  <div class="scrim" id="rscrim"><div class="dialog">
+    <h3>Daily routine</h3>
+    <div class="sub" style="margin-top:0">Set your own routine and reminder sound. Medicine schedules must still follow the prescription exactly.</div>
+    <div class="row2"><label class="field"><span>Breakfast</span><input id="r-breakfast" type="time"></label>
+      <label class="field"><span>Lunch</span><input id="r-lunch" type="time"></label></div>
+    <div class="row2"><label class="field"><span>Evening</span><input id="r-evening" type="time"></label>
+      <label class="field"><span>Dinner</span><input id="r-dinner" type="time"></label></div>
+    <label class="field"><span>Bedtime</span><input id="r-bedtime" type="time"></label>
+    <div class="alert-setting">
+      <label class="chk"><input type="checkbox" id="r-voice" checked><span>Spoken medicine-time alert</span></label>
+      <label class="field" style="margin:8px 0 0"><span>Alert volume: <b id="r-volume-label">90%</b></span><input id="r-volume" type="range" min="20" max="100" step="5" value="90" oninput="$('r-volume-label').textContent=this.value+'%'"></label>
+      <p class="hint">The browser and device volume, silent mode, Bluetooth routing and power settings still control the actual loudness.</p>
+    </div>
+    <div class="acts"><button class="btn t" onclick="$('rscrim').classList.remove('on')">Cancel</button>
+      <button class="btn" onclick="saveRoutine()">Save</button></div>
+  </div></div>
+
+  <!-- INCOMING-CALL STYLE REMINDER -->
+  <div id="ring" onclick="if(event.target.closest('button'))return;silence()">
+    <div class="r-top">MEDICINE TIME · PLEASE CHECK YOUR INSTRUCTIONS</div>
+    <div class="r-av"><span class="ms">medication</span></div>
+    <div class="r-time" id="r-time"></div>
+    <div class="r-who" id="r-who"></div>
+    <div class="r-list" id="r-list"></div>
+    <div class="r-btns">
+      <button class="rb red" onclick="ringSnooze()"><span class="ms">snooze</span><span id="rb-s">Snooze 10 min</span></button>
+      <button class="rb green" onclick="ringTaken()"><span class="ms" id="rb-i">check</span><span id="rb-t">Confirm taken</span></button>
+    </div>
+  </div>
+
+  <button class="fab" id="fab" aria-label="Add medicine" style="display:none" onclick="openEdit(null)"><span class="ms">add</span>Add</button>
+
+  <!-- ONBOARDING (shown right after a new profile is made) -->
+  <div id="onboard">
+    <div class="logo"><svg class="m-logo" viewBox="0 0 100 100" role="img" aria-label="MediMate"><use href="#mlogo"/></svg></div>
+    <h1>Let's add your medicines</h1>
+    <p class="lead">Set up your reminders in a minute. You can change everything later.</p>
+    <div class="step"><div class="n">1</div><div><b>Enter the prescribed details</b><small>Use the medicine name and instructions exactly as written by the doctor or pharmacist.</small></div></div>
+    <div class="step"><div class="n">2</div><div><b>Set the reminder</b><small>Enter only the prescribed time and duration. Ask an adult or pharmacist if anything is unclear.</small></div></div>
+    <div class="step"><div class="n">3</div><div><b>Check before using</b><small>For a child or teenager, a parent or guardian must verify every detail and supervise medicine-taking.</small></div></div>
+    <button class="btn alt" onclick="closeOnboard();goTab('time');openEdit(null)"><span class="ms">add</span>Add medicine</button>
+    <button class="btn t" onclick="closeOnboard()">Skip for now</button>
+  </div>
+
+  <!-- PIN -->
+  <div class="scrim" id="nscrim"><div class="dialog">
+    <h3 id="n-title">Enter PIN</h3>
+    <div class="sub" id="n-hint" style="margin-top:0"></div>
+    <div id="n-pinrow"><label class="field"><span>4 digit PIN</span><input id="n-pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off"></label></div>
+    <div id="n-mailrow" style="display:none"><label class="field"><span>Date of birth of this profile</span><input id="n-mail" type="date"></label></div>
+    <div class="err" id="n-err"></div>
+    <div class="acts"><button class="btn t" id="n-forgot" onclick="pinForgot()">Forgot PIN?</button><button class="btn t" onclick="closePin()">Cancel</button><button class="btn" id="n-ok" onclick="checkPin()">Open</button></div>
+  </div></div>
+
+  <!-- BACKUP -->
+  <div class="scrim" id="bscrim"><div class="dialog">
+    <h3>Back up your data</h3>
+    <div class="sub" style="margin-top:0">This backup is plain text and is not encrypted. It contains names, dates of birth and medicine details. Keep it private and in a secure place with a parent or guardian. Do not post it publicly or share it with strangers. To restore, paste a saved backup here and tap Restore.</div>
+    <label class="field"><span>Backup text</span><textarea id="b-text" rows="7"></textarea></label>
+    <div class="err" id="b-err"></div>
+    <div class="acts"><button class="btn t" onclick="$('bscrim').classList.remove('on')">Close</button><button class="btn t" onclick="copyBackup()">Copy</button><button class="btn" onclick="restoreBackup()">Restore</button></div>
+  </div></div>
+
+  <!-- ADULT-ONLY, ON-DEVICE PRESCRIPTION IMAGE TEXT EXTRACTION -->
+  <div class="scrim" id="rxscrim"><div class="dialog">
+    <h3>Prescription text scan</h3>
+    <p class="rx-status" id="rx-status">Choose a clear, well-lit image. Text recognition can make mistakes.</p>
+    <textarea id="rx-text" spellcheck="false" placeholder="Recognised text will appear here. It is not a medicine instruction or a verified prescription."></textarea>
+    <div class="rx-note"><b>Important:</b> This is text extraction only. It does not identify safe doses, interpret abbreviations, check interactions or create reminders. Compare every character with the original prescription and ask a doctor or pharmacist whenever anything is unclear. The scan is available only to profiles aged 19 or older.</div>
+    <div class="acts"><button class="btn t" onclick="closePrescriptionScan()">Close</button><button class="btn t" onclick="copyPrescriptionText()">Copy text</button><button class="btn" onclick="$('rxfile').click()">Choose another image</button></div>
+  </div></div>
+
+  <!-- TERMS -->
+  <div class="scrim" id="tscrim"><div class="dialog">
+    <h3>Terms and Privacy Policy</h3>
+    <div class="terms">
+      <p><b>1. For all ages.</b> MediMate has no minimum age limit. Children, teenagers and users aged 18 and younger may use it only with a parent or legal guardian who sets up or supervises the profile. A child must not manage or take medicine based only on this app.</p>
+      <p><b>2. Not medical advice.</b> MediMate is a reminder and record-keeping tool. It does not diagnose, prescribe, recommend medicines, calculate doses, check drug interactions or replace a doctor or pharmacist. Use only medicines prescribed or approved for that person by a qualified healthcare professional. Never start, stop, change, share or take an extra dose because of this app or a streak record.</p>
+      <p><b>3. Adult supervision for children.</b> For users aged 18 and younger, a parent or guardian must check the medicine name, strength, dose, timing, food instructions and duration against the current prescription or label, and supervise medicine-taking. Do not guess unclear instructions. Ask the prescribing doctor or pharmacist to clarify them. Only mark a dose as taken after confirming it was actually taken as directed.</p>
+      <p><b>4. Loud alerts are not guaranteed.</b> MediMate can play a repeating sound and spoken reminder while the app is running, the page is open and the browser allows audio. The actual loudness depends on the device volume, silent/do-not-disturb mode, connected headphones or speakers, browser permissions, battery and operating-system settings. Browsers may pause or stop timers and audio when a tab is backgrounded, the device is locked, the browser is closed, the device sleeps or the device is offline. Notifications and calendar alerts can also be delayed, blocked or fail. No alert can be guaranteed to be heard or delivered. Test the sound, keep device volume and permissions appropriate, and use a separate reliable alarm or caregiver check for important medicines. Never rely on MediMate as the only reminder, emergency system or medical device.</p>
+      <p><b>5. Prescription image text scan (adults aged 19+ only).</b> For profiles aged 19 or older, the app can use Tesseract.js in the browser to extract printed text from an image. This is OCR, not medical interpretation: it can misread names, numbers, units and abbreviations. It does not calculate a schedule or automatically add medicines. The user must compare the output with the original prescription and ask a doctor or pharmacist about anything unclear. The image is processed in the browser; the OCR software and English language data may be downloaded from a third-party CDN. Do not use the scan if you do not accept that software download. The feature is hidden and blocked for profiles aged 18 and younger.</p>
+      <p><b>6. Information and privacy.</b> Profile names, dates of birth, medicine details, reminder settings and taken marks are stored in this browser on this device. The date of birth is used for age checks, birthday reminders and PIN recovery. Anyone with access to this device or browser profile may be able to view them. The OCR text is displayed temporarily and is not intentionally saved in the app's local profile data. Protect the device and do not share screenshots or backups publicly.</p>
+      <p><b>7. Sharing and backups.</b> MediMate does not send prescription images or medicine details to a generative AI service. If you choose the Google Calendar icon for a medicine, its name and dose are included in a calendar link handled by Google. A backup is plain text, is not encrypted, and includes profile names, dates of birth and medicine details; keep it private. Clearing browser data or using Reset app deletes local data. Store backups securely.</p>
+      <p><b>8. If something goes wrong.</b> If anyone may have taken the wrong medicine, an extra dose or an unknown substance, contact a parent or guardian, doctor, pharmacist or local emergency service promptly. Do not use this app to decide what to do next.</p>
+      <p><b>9. Service limits and legal rights.</b> The app is provided as a prototype reminder tool and may contain errors, interruptions or data loss. The developer cannot promise uninterrupted service, perfect accuracy, successful reminders or that every device/browser will behave identically. These terms do not remove or limit any rights or responsibilities that cannot legally be excluded. Obtain legal and regulatory advice before public or commercial release.</p>
+      <p><b>10. Agreement.</b> By ticking the agreement box, you confirm these terms have been read. For a profile belonging to someone aged 18 or younger, a parent or legal guardian must confirm supervision during setup. You can delete local profile data at any time with Reset app.</p>
+    </div>
+    <div class="acts"><button class="btn" onclick="closeTerms()">Close</button></div>
+  </div></div>
+
+  <!-- PROFILE DETAILS: opened by tapping the blue initials circle -->
+  <div id="profile-view" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+    <div class="profile-toolbar">
+      <button type="button" class="profile-back" aria-label="Back to home" onclick="closeProfileDetails()"><span class="ms">arrow_back</span></button>
+      <h2 id="profile-title">Profile details</h2>
+      <button type="button" class="btn" onclick="openEditProfile()">Edit profile</button>
+    </div>
+    <div id="profile-content"></div>
+  </div>
+
+  <div id="toast"></div>
+  <div id="app-error" role="alert" aria-live="assertive">
+    <span class="ms" style="font-size:48px;color:#0b57d0">medical_information</span>
+    <h2>MediMate needs to refresh</h2>
+    <p id="app-error-msg">Something interrupted this screen. Your saved data has not intentionally been erased. Try refreshing the app or return to your profiles.</p>
+    <button class="btn" onclick="recoverApp()">Try again</button>
+    <button class="btn t" onclick="forceShowProfiles()">Back to profiles</button>
+  </div>
+</div>
+
+<script>
+const APP="MediMate";
+const $=id=>document.getElementById(id);
+const pad=n=>String(n).padStart(2,'0');
+const dkey=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const parseD=s=>new Date(s+'T00:00:00');
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=t=>{let [h,m]=t.split(':').map(Number);const ap=h>=12?'PM':'AM';h=h%12||12;return h+':'+pad(m)+' '+ap};
+const fmtD=d=>d.toLocaleDateString('en',{day:'numeric',month:'short'});
+const midnight=()=>{const d=new Date();d.setHours(0,0,0,0);return d};
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const toMin=t=>{const [h,m]=t.split(':').map(Number);return h*60+m};
+const fromMin=n=>{n=Math.max(0,Math.min(1439,n));return pad(Math.floor(n/60))+':'+pad(n%60)};
+let today=midnight();
+
+$('appname').textContent=APP;
+
+// ---------- storage ----------
+const DEF_ROUTINE={breakfast:'08:00',lunch:'13:00',evening:'17:30',dinner:'20:00',bedtime:'22:00'};
+const MISS_MIN=90;            // minutes after its time a dose counts as "missed"
+const KEY='mm_store_v2';
+const TERMS_VERSION=4;
+let store={profiles:[],current:null}, storageOk=true;
+const fired={};
+const ini=n=>([...String(n).trim()][0]||'?').toUpperCase();
+function norm(p){
+  p.routine=Object.assign({},DEF_ROUTINE,p.routine||{});p.meds=Array.isArray(p.meds)?p.meds:[];p.taken=p.taken||{};p.prn=Array.isArray(p.prn)?p.prn:[];p.snooze=p.snooze||{};p.pin=p.pin||'';p.dob=p.dob||'';p.agreed=p.agreed||0;p.termsVersion=p.termsVersion||0;p.best=p.best||0;
+  p.alertVolume=Math.min(100,Math.max(20,Number(p.alertVolume)||90));
+  if(typeof p.voiceAlerts!=='boolean')p.voiceAlerts=true;
+  delete p.email;
+  p.nextId=p.nextId||(Math.max(0,...p.meds.map(m=>m.id),...p.prn.map(m=>m.id))+1);
+  // Keep historical taken marks: they are needed to calculate a truthful
+  // all-time longest streak. Snooze entries are temporary and can be cleaned up.
+  p.bestStreak=Math.max(0,Number(p.bestStreak)||0,Number(p.best)||0);
+  Object.keys(p.snooze).forEach(k=>{if(p.snooze[k]<Date.now()-864e5)delete p.snooze[k]});
+  return p}
+try{const s=localStorage.getItem(KEY);if(s){const o=JSON.parse(s);if(o&&Array.isArray(o.profiles))store=o}}catch(e){storageOk=false}
+try{localStorage.setItem('mm_test','1');localStorage.removeItem('mm_test')}catch(e){storageOk=false}
+store.profiles.forEach(norm);store.current=null;
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist().catch(()=>{})}catch(e){}
+function save(){scheduleNative();try{localStorage.setItem(KEY,JSON.stringify(store));return true}catch(e){storageOk=false;$('warn').style.display='block';return false}}
+const P=()=>store.profiles.find(p=>p.id===store.current);
+
+let editing=null, calY=today.getFullYear(), calM=today.getMonth(), selDay=new Date(today), delArmed=false, scanning=false,
+    restoreArmed=false, pinFor=null, forgot=false, pinMode='open';
+
+function activeOn(m,d){const diff=Math.round((d-parseD(m.start))/864e5);return diff>=0&&diff<m.days&&diff%(m.every||1)===0}
+const medsOf=(p,d)=>p.meds.filter(m=>activeOn(m,d)).sort((a,b)=>a.time.localeCompare(b.time));
+const medsOn=d=>medsOf(P(),d);
+const isTaken=(m,d)=>!!P().taken[dkey(d)+'_'+m.id];
+
+function toast(msg,act,ms){
+  const t=$('toast');t.innerHTML='<span>'+esc(msg)+'</span>'+(act?'<button id="t-act">'+esc(act.label)+'</button>':'');
+  t.style.display='flex';if(act)$('t-act').onclick=()=>{act.fn();t.style.display='none'};
+  clearTimeout(t._x);t._x=setTimeout(()=>t.style.display='none',ms||(act?6000:4500));
+}
+
+// ---------- ringtone + incoming-call reminder ----------
+let actx=null;
+const AC=window.AudioContext||window.webkitAudioContext;
+function unlockAudio(){try{actx=actx||(AC?new AC():null);if(actx&&actx.state==='suspended'){const resumed=actx.resume();if(resumed&&resumed.catch)resumed.catch(()=>{})}}catch(e){}}
+function ringTone(){
+  try{
+    unlockAudio();if(!actx)return;
+    const p=store.profiles.find(x=>x.id===ring.pid)||P();
+    const volume=Math.max(.2,Math.min(1,(p&&p.alertVolume||90)/100));
+    const t=actx.currentTime,master=actx.createGain();
+    master.gain.setValueAtTime(volume*.8,t);master.connect(actx.destination);
+    // soft bell chime: four rising notes, sine waves with a gentle decay
+    [[1046.5,0],[1318.5,.26],[1568,.52],[2093,.78]].forEach(([f,off])=>{
+      [[1,.5],[2,.1]].forEach(([mult,amp])=>{
+        const o=actx.createOscillator(),g=actx.createGain(),s=t+off;
+        o.type='sine';o.frequency.setValueAtTime(f*mult,s);
+        g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(amp,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+1.1);
+        o.connect(g);g.connect(master);o.start(s);o.stop(s+1.15);
+      });
+    });
+    setTimeout(()=>{try{master.disconnect()}catch(e){}},2400);
+  }catch(e){console.warn('Audio reminder unavailable',e)}
+}
+function speakReminder(){
+  try{
+    const p=store.profiles.find(x=>x.id===ring.pid)||P();
+    if(!p||p.voiceAlerts===false||!('speechSynthesis' in window)||!window.SpeechSynthesisUtterance)return;
+    window.speechSynthesis.cancel();
+    const child=profileAge(p.dob)<=18;
+    const message=ring.test?'This is a test of your MediMate reminder.':child
+      ?'Medicine time. Please ask your parent or guardian to help you check your medicine reminder.'
+      :'Medicine time. Please check your medicine instructions now.';
+    const u=new SpeechSynthesisUtterance(message);u.volume=1;u.rate=1.02;u.pitch=1.05;
+    window.speechSynthesis.speak(u);
+  }catch(e){console.warn('Spoken reminder unavailable',e)}
+}
+const ring={active:false,pid:null,meds:[],start:0,loop:null,vib:null,stopT:null,rt:null,voiceT:null,reps:0,test:false};
+const fkey=(p,m)=>p.id+'_'+dkey(midnight())+'_'+m.id+'_'+m.time;
+function ringList(){$('r-list').innerHTML=ring.meds.map(m=>`<div class="r-item"><b>${esc(m.name)}</b><small>${esc(m.dose)}</small></div>`).join('')}
+function stopSound(){
+  clearInterval(ring.loop);clearInterval(ring.vib);clearInterval(ring.voiceT);clearTimeout(ring.stopT);clearTimeout(ring.rt);
+  try{navigator.vibrate&&navigator.vibrate(0)}catch(e){}
+  try{if('speechSynthesis' in window)window.speechSynthesis.cancel()}catch(e){}
+}
+function sound(){
+  stopSound();$('ring').classList.remove('quiet');
+  ringTone();ring.loop=setInterval(ringTone,2600);speakReminder();ring.voiceT=setInterval(speakReminder,18000);
+  const vib=()=>{try{navigator.vibrate&&navigator.vibrate([500,250,500,250,700])}catch(e){}};vib();ring.vib=setInterval(vib,2600);
+  ring.stopT=setTimeout(silence,90000);
+}
+function startRing(p,list,test){
+  if(ring.active){
+    // a new dose for the same person joins the ringing screen instead of being blocked
+    if(test||ring.test||ring.pid!==p.id)return false;
+    list.forEach(m=>{if(!ring.meds.some(x=>x.id===m.id))ring.meds.push(m)});
+    ringList();sound();return true;
+  }
+  Object.assign(ring,{active:true,pid:p.id,meds:list.slice(),start:Date.now(),test:!!test,reps:0});
+  const n=new Date();
+  $('r-time').textContent=fmt(pad(n.getHours())+':'+pad(n.getMinutes()));
+  $('r-who').textContent=(store.profiles.length>1||test?'For '+p.name+' · ':'')+(profileAge(p.dob)<=18?'Ask a parent or guardian to help':'Check the prescription instructions');
+  $('ring').querySelector('.r-top').textContent=test?'TEST REMINDER':'MEDICINE TIME · PLEASE CHECK YOUR INSTRUCTIONS';
+  $('rb-s').textContent=test?'Snooze':'Snooze 10 min';$('rb-t').textContent=test?'Cancel':'Confirm taken';$('rb-i').textContent=test?'close':'check';
+  ringList();$('ring').classList.add('on');document.querySelector('.phone').classList.add('ringing');sound();
+  try{if('Notification' in window&&Notification.permission==='granted')new Notification(APP,{body:list.map(m=>m.name).join(', ')})}catch(e){}
+  return true;
+}
+// Silence only stops the noise. If nobody acknowledges it, it retries after 3 minutes (up to 5 times).
+function silence(){
+  stopSound();$('ring').classList.add('quiet');
+  if(ring.active&&!ring.test&&ring.reps<5)ring.rt=setTimeout(()=>{if(ring.active){ring.reps++;sound()}},180000);
+}
+function endRing(){stopSound();ring.active=false;$('ring').classList.remove('on','quiet');document.querySelector('.phone').classList.remove('ringing')}
+function ringTaken(){
+  const p=store.profiles.find(x=>x.id===ring.pid);
+  if(p&&!ring.test){
+    const names=ring.meds.map(m=>m.name).join(', ');
+    if(!window.confirm('Record these dose(s) as taken: '+names+'? Only confirm after they were actually taken as prescribed. For a child, check with a parent or guardian.'))return;
+    ring.meds.forEach(m=>{p.taken[dkey(midnight())+'_'+m.id]=true});save();
+  }
+  endRing();if(P())render();
+}
+function ringSnooze(){
+  const p=store.profiles.find(x=>x.id===ring.pid),list=ring.meds.slice(),test=ring.test;
+  endRing();
+  if(p&&!test){
+    const until=Date.now()+600000;     // saved, so a reload does not lose the snooze
+    list.forEach(m=>{p.snooze[dkey(midnight())+'_'+m.id]=until;delete fired[fkey(p,m)]});
+    save();toast('Snoozed for 10 minutes');
+  }else if(test)toast('Snooze works like this for real reminders');
+}
+function testRing(){closeDrawer();unlockAudio();startRing(P(),[{id:-1,name:'Test reminder',dose:'Your real reminders will look like this'}],true)}
+
+// "lift to silence": picking the phone up makes the ringing stop
+let lastAcc=null,motionOn=false;
+function startMotion(){
+  if(motionOn)return;motionOn=true;
+  window.addEventListener('devicemotion',e=>{
+    if(!ring.active)return;const a=e.accelerationIncludingGravity;if(!a)return;
+    const mag=Math.sqrt((a.x||0)**2+(a.y||0)**2+(a.z||0)**2);
+    if(lastAcc!==null&&Math.abs(mag-lastAcc)>3.5&&Date.now()-ring.start>1500)silence();
+    lastAcc=mag;
+  });
+}
+function enableMotion(){
+  try{if(typeof DeviceMotionEvent==='undefined')return;
+    if(DeviceMotionEvent.requestPermission)DeviceMotionEvent.requestPermission().then(r=>{if(r==='granted')startMotion()}).catch(()=>{});
+    else startMotion()}catch(e){}
+}
+function askPermission(){try{if('Notification' in window&&Notification.permission==='default'){const permission=Notification.requestPermission();if(permission&&permission.catch)permission.catch(()=>{})}}catch(e){}}
+
+// ---------- phone notifications (after converting to an APK) ----------
+// Works with Capacitor "@capacitor/local-notifications" or Cordova "cordova-plugin-local-notification".
+// In a normal browser these plugins do not exist, so this simply does nothing there.
+const LN=()=>{try{return window.Capacitor&&window.Capacitor.Plugins&&window.Capacitor.Plugins.LocalNotifications||null}catch(e){return null}};
+const CDV=()=>{try{return window.cordova&&window.cordova.plugins&&window.cordova.plugins.notification&&window.cordova.plugins.notification.local||null}catch(e){return null}};
+let schedT=null,lnReady=false;
+function scheduleNative(){clearTimeout(schedT);schedT=setTimeout(doSchedule,500)}
+function nativeItems(){
+  const out=[],now=Date.now(),multi=store.profiles.length>1;
+  store.profiles.forEach(p=>{
+    const who=multi?' for '+p.name:'';
+    for(let i=0;i<14;i++){
+      const d=addDays(midnight(),i);
+      medsOf(p,d).forEach(m=>{
+        if(m.review||p.taken[dkey(d)+'_'+m.id])return;
+        const [h,mi]=m.time.split(':').map(Number);
+        const at=new Date(d.getFullYear(),d.getMonth(),d.getDate(),h,mi,0);
+        if(at.getTime()>now+3000)out.push({at,title:'Medicine time',body:m.name+(m.dose?' · '+m.dose:'')+who});
+      });
+    }
+    Object.keys(p.snooze).forEach(k=>{                       // snoozed doses ring again
+      const until=p.snooze[k],mid=Number(k.split('_').pop()),m=p.meds.find(x=>x.id===mid);
+      if(m&&until>now+3000)out.push({at:new Date(until),title:'Medicine time (snoozed)',body:m.name+who});
+    });
+  });
+  out.sort((a,b)=>a.at-b.at);
+  return out.slice(0,200).map((x,i)=>Object.assign(x,{id:i+1}));
+}
+async function doSchedule(){
+  try{
+    const ln=LN(),cd=ln?null:CDV();if(!ln&&!cd)return;
+    const items=nativeItems();
+    if(ln){
+      if(!lnReady){
+        try{await ln.requestPermissions()}catch(e){}
+        try{await ln.createChannel({id:'medicine',name:'Medicine reminders',description:'Reminders at your medicine times',importance:5,visibility:1,vibration:true})}catch(e){}
+        lnReady=true;
+      }
+      try{const pend=await ln.getPending();if(pend&&pend.notifications&&pend.notifications.length)await ln.cancel({notifications:pend.notifications.map(n=>({id:n.id}))})}catch(e){}
+      if(items.length)await ln.schedule({notifications:items.map(x=>({id:x.id,title:x.title,body:x.body,channelId:'medicine',schedule:{at:x.at,allowWhileIdle:true}}))});
+    }else{
+      cd.cancelAll(()=>{if(items.length)cd.schedule(items.map(x=>({id:x.id,title:x.title,text:x.body,trigger:{at:x.at},foreground:true,wakeup:true,priority:2,vibrate:true})))});
+    }
+  }catch(e){console.warn('Could not schedule phone notifications',e)}
+}
+document.addEventListener('deviceready',scheduleNative);
+
+// ---------- reminder checker ----------
+// A dose is "due" from its time until MISS_MIN minutes later, so a slow or paused
+// timer (for example a background tab) still rings as soon as the page wakes up.
+function checkReminders(){
+  const nd=midnight();if(dkey(nd)!==dkey(today)){today=nd;if(P())render()}
+  const n=new Date(),nowM=n.getHours()*60+n.getMinutes(),nowMs=Date.now();
+  store.profiles.forEach(p=>{
+    const due=medsOf(p,today).filter(m=>{
+      const diff=nowM-toMin(m.time),k=dkey(today)+'_'+m.id;
+      return !m.review&&diff>=0&&diff<=MISS_MIN&&!p.taken[k]&&!(p.snooze[k]>nowMs)&&!fired[fkey(p,m)];
+    });
+    if(due.length&&startRing(p,due))due.forEach(m=>{fired[fkey(p,m)]=1});
+  });
+}
+setInterval(checkReminders,10000);
+setInterval(()=>{if(P()&&!document.hidden)render()},60000);
+let hiddenAt=0;
+function lockNow(id){
+  document.querySelectorAll('.scrim').forEach(s=>s.classList.remove('on'));
+  closeDrawer();closeProfileDetails();closeOnboard();
+  store.current=null;renderChooser();$('profiles').style.display='block';askPin(id);
+}
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){hiddenAt=Date.now();return}
+  const p=P();
+  if(p&&p.pin&&hiddenAt&&Date.now()-hiddenAt>10000&&!ring.active){hiddenAt=0;lockNow(p.id);return}
+  hiddenAt=0;checkReminders();if(P())render();
+});
+window.addEventListener('focus',checkReminders);
+
+// ---------- profile chooser ----------
+function renderChooser(){
+  $('plist').innerHTML=store.profiles.length?store.profiles.map(p=>
+    `<div class="card" style="cursor:pointer" role="button" onclick="openProfile(${p.id})">
+      <div class="avatar">${esc(ini(p.name))}</div>
+      <div class="m"><b>${esc(p.name)}</b><small>${p.dob?'Birthday reminder enabled':''}</small></div>
+      ${p.pin?'<span class="ms" style="color:#747775">lock</span>':''}
+      <span class="ms" style="color:#747775">chevron_right</span></div>`).join('')
+    :'<div class="empty">No profiles yet.<br>Tap "Add profile" to start.</div>';
+}
+function showChooser(){closeDrawer();renderChooser();$('profiles').style.display='block'}
+function openProfile(id){const p=store.profiles.find(x=>x.id===id);if(p&&p.pin)askPin(id);else enter(id)}
+function enter(id){
+  const q=store.profiles.find(x=>x.id===id);
+  if(q&&(!q.dob||!q.agreed||q.termsVersion!==TERMS_VERSION)){openAddProfile(q);return}
+  store.current=id;save();
+  $('profiles').style.display='none';
+  selDay=new Date(today);calY=today.getFullYear();calM=today.getMonth();
+  unlockAudio();enableMotion();askPermission();
+  goTab('home');render();
+}
+let profEdit=null,profileEditMode=false;
+const fmtLong=d=>d.toLocaleDateString('en',{day:'numeric',month:'long',year:'numeric'});
+function openTerms(){$('tscrim').classList.add('on')}
+function closeTerms(){$('tscrim').classList.remove('on')}
+// p given = an older profile that still needs a date of birth and the terms
+function openAddProfile(p){
+  profileEditMode=false;profEdit=p||null;$('p-title').textContent=p?'Finish setting up':'Welcome';
+  $('p-name').value=p?p.name:'';$('p-dob').value=p&&p.dob?p.dob:'';$('p-dob').max=dkey(midnight());$('p-dob').readOnly=!!(p&&p.dob);
+  $('p-agree').checked=false;$('p-guardian').checked=false;$('p-err').textContent='';updateGuardianField();$('pscrim').classList.add('on');setTimeout(()=>$('p-name').focus(),50)}
+function openEditProfile(){
+  const p=P();if(!p)return;
+  profileEditMode=true;profEdit=p;$('p-title').textContent='Edit profile';
+  $('p-name').value=p.name;$('p-dob').value=p.dob;$('p-dob').max=dkey(midnight());$('p-dob').readOnly=false;
+  $('p-agree').checked=false;$('p-guardian').checked=false;$('p-err').textContent='';updateGuardianField();
+  closeProfileDetails();$('pscrim').classList.add('on');setTimeout(()=>$('p-name').focus(),50);
+}
+function closeAddProfile(){$('pscrim').classList.remove('on');profileEditMode=false}
+function profileAge(dob){
+  const b=parseD(dob),t=midnight();let age=t.getFullYear()-b.getFullYear();
+  if(t.getMonth()<b.getMonth()||(t.getMonth()===b.getMonth()&&t.getDate()<b.getDate()))age--;
+  return age;
+}
+function updateGuardianField(){
+  const dob=$('p-dob').value,minor=!!dob&&!isNaN(parseD(dob))&&profileAge(dob)<=18;
+  $('p-guardian-wrap').style.display=minor?'flex':'none';
+  $('p-agree-text').innerHTML=minor
+    ?'A parent or legal guardian has read and agrees to the <a href="#" onclick="openTerms();return false">Terms and Privacy Policy</a> for this child.'
+    :'I have read and agree to the <a href="#" onclick="openTerms();return false">Terms and Privacy Policy</a>.';
+  if(!minor)$('p-guardian').checked=false;
+}
+$('p-dob').addEventListener('change',updateGuardianField);
+function saveProfile(){
+  const name=$('p-name').value.trim(),dob=$('p-dob').value,b=dob?parseD(dob):null;
+  if(!name){$('p-err').textContent='Please enter your name.';return}
+  if(!b||isNaN(b)||b>midnight()||b.getFullYear()<1900){$('p-err').textContent='Please enter a valid date of birth.';return}
+  if(!$('p-agree').checked){$('p-err').textContent='Please confirm that the Terms and Privacy Policy have been read.';return}
+  if(profileAge(dob)<=18&&!$('p-guardian').checked){$('p-err').textContent='A parent or legal guardian must confirm supervision for this child profile.';return}
+  if(profEdit){
+    const duplicate=store.profiles.some(x=>x.id!==profEdit.id&&x.dob===dob&&x.name.toLowerCase()===name.toLowerCase());
+    if(duplicate){$('p-err').textContent='Another profile already uses this name and date of birth.';return}
+    const p=profEdit,wasAdult=profileAge(p.dob)>18;p.name=name;p.dob=dob;p.agreed=Date.now();p.termsVersion=TERMS_VERSION;
+    if(wasAdult&&profileAge(dob)<=18)p.meds.forEach(m=>{m.review=true});
+    save();profileEditMode=false;profEdit=null;closeAddProfile();enter(p.id);if(!p.meds.length)showOnboard();return;
+  }
+  if(store.profiles.some(p=>p.dob===dob&&p.name.toLowerCase()===name.toLowerCase())){$('p-err').textContent='This profile is already added.';return}
+  const id=Date.now(),p=norm({id,name,dob,agreed:Date.now(),termsVersion:TERMS_VERSION,meds:[],taken:{},nextId:1});
+  store.profiles.push(p);save();closeAddProfile();enter(p.id);showOnboard();
+}
+function showOnboard(){$('onboard').style.display='flex'}
+function closeOnboard(){$('onboard').style.display='none'}
+let resetArmed=false;
+// Erases everything on this device and shows the first-time screen again (no undo, so back up first)
+function resetApp(){
+  const lab=$('d-reset').lastElementChild;
+  if(!resetArmed){resetArmed=true;lab.textContent='Tap again to erase everything';setTimeout(()=>{resetArmed=false;lab.textContent='Reset app'},4000);return}
+  resetArmed=false;lab.textContent='Reset app';
+  try{localStorage.removeItem(KEY)}catch(e){}
+  store={profiles:[],current:null};
+  endRing();closeDrawer();closeOnboard();renderChooser();$('profiles').style.display='block';openAddProfile();
+}
+function deleteProfile(){
+  const lab=$('d-del').lastElementChild;
+  if(!delArmed){delArmed=true;lab.textContent='Tap again to confirm';setTimeout(()=>{delArmed=false;lab.textContent='Delete this profile'},3500);return}
+  const gone=P();
+  store.profiles=store.profiles.filter(p=>p.id!==store.current);store.current=null;save();
+  delArmed=false;lab.textContent='Delete this profile';showChooser();
+  toast('Profile deleted',{label:'Undo',fn:()=>{store.profiles.push(gone);save();renderChooser()}},10000);
+}
+
+// ---------- PIN lock (keeps other people on this device out of a profile) ----------
+async function hashPin(pin,salt){
+  try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(salt+':'+pin));return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('')}
+  catch(e){return 'p:'+salt+':'+pin}
+}
+function pinDialog(mode,title,hint,ok){
+  pinMode=mode;forgot=false;$('n-title').textContent=title;$('n-hint').textContent=hint;$('n-ok').textContent=ok;
+  $('n-pin').value='';$('n-mail').value='';$('n-err').textContent='';
+  $('n-pinrow').style.display='block';$('n-mailrow').style.display='none';$('n-forgot').style.display=mode==='open'?'':'none';
+  $('nscrim').classList.add('on');setTimeout(()=>$('n-pin').focus(),50);
+}
+function askPin(id){pinFor=id;pinDialog('open','Enter PIN','This profile is locked.','Open')}
+function openSetPin(){closeDrawer();pinFor=store.current;pinDialog('set','PIN lock','Type a 4 digit PIN. Leave it empty to remove the lock.','Save')}
+function closePin(){$('nscrim').classList.remove('on')}
+function pinForgot(){forgot=true;$('n-pinrow').style.display='none';$('n-mailrow').style.display='block';$('n-forgot').style.display='none';$('n-err').textContent='';$('n-hint').textContent='Enter the date of birth of this profile to remove the PIN.'}
+async function checkPin(){
+  const p=store.profiles.find(x=>x.id===pinFor);if(!p)return;
+  if(pinMode==='set'){
+    const v=$('n-pin').value.trim();
+    if(v&&!/^\d{4}$/.test(v)){$('n-err').textContent='The PIN must be 4 digits.';return}
+    p.pin=v?await hashPin(v,String(p.id)):'';save();closePin();toast(v?'PIN saved':'PIN removed');return;
+  }
+  if(forgot){
+    if(p.dob&&$('n-mail').value===p.dob){p.pin='';save();closePin();toast('PIN removed. You can set a new one in the menu.');enter(p.id)}
+    else $('n-err').textContent='That is not the date of birth of this profile.';
+    return;
+  }
+  if(await hashPin($('n-pin').value.trim(),String(p.id))===p.pin){closePin();enter(p.id)}
+  else $('n-err').textContent='Wrong PIN. Try again.';
+}
+
+// ---------- back up and restore ----------
+function openBackup(){closeDrawer();restoreArmed=false;$('b-err').textContent='';$('b-text').value=JSON.stringify({app:APP,v:2,profiles:store.profiles});$('bscrim').classList.add('on')}
+function copyBackup(){
+  const t=$('b-text');t.select();const ok=()=>toast('Copied. Save it somewhere safe.');
+  try{navigator.clipboard.writeText(t.value).then(ok).catch(()=>{document.execCommand('copy');ok()})}catch(e){try{document.execCommand('copy');ok()}catch(e2){}}
+}
+function restoreBackup(){
+  let o;try{o=JSON.parse($('b-text').value)}catch(e){$('b-err').textContent='This is not a valid backup.';return}
+  if(!o||!Array.isArray(o.profiles)||!o.profiles.length||!o.profiles.every(p=>p&&typeof p.id==='number'&&typeof p.name==='string'&&Array.isArray(p.meds))){$('b-err').textContent='This is not a valid backup.';return}
+  if(!restoreArmed){restoreArmed=true;$('b-err').textContent='Tap Restore again to replace all data on this device.';return}
+  store.profiles=o.profiles.map(norm);store.current=null;save();$('bscrim').classList.remove('on');showChooser();toast('Backup restored');
+}
+
+// ---------- drawer ----------
+function openDrawer(){renderDrawer();$('dscrim').style.display='block';$('drawer').classList.add('on')}
+function closeDrawer(){$('dscrim').style.display='none';$('drawer').classList.remove('on')}
+function renderDrawer(){
+  const p=P();
+  $('d-av').textContent=ini(p.name);$('d-name').textContent=p.name;$('d-mail').textContent=p.dob?'Birthday reminder enabled':'';
+  $('d-list').innerHTML=store.profiles.map(x=>
+    `<div class="item ${x.id===p.id?'on':''}" onclick="closeDrawer();openProfile(${x.id})">
+      <div class="avatar">${esc(ini(x.name))}</div>${esc(x.name)}</div>`).join('');
+}
+
+// ---------- daily routine ----------
+function openRoutine(){
+  closeDrawer();const p=P(),r=p.routine;
+  ['breakfast','lunch','evening','dinner','bedtime'].forEach(k=>$('r-'+k).value=r[k]);
+  $('r-voice').checked=p.voiceAlerts!==false;$('r-volume').value=p.alertVolume||90;$('r-volume-label').textContent=$('r-volume').value+'%';
+  $('rscrim').classList.add('on');
+}
+function saveRoutine(){
+  const p=P(),r={};for(const k of ['breakfast','lunch','evening','dinner','bedtime']){r[k]=$('r-'+k).value||DEF_ROUTINE[k]}
+  p.routine=r;p.voiceAlerts=$('r-voice').checked;p.alertVolume=Math.min(100,Math.max(20,Number($('r-volume').value)||90));
+  save();$('rscrim').classList.remove('on');toast('Daily routine and alert settings saved');
+}
+
+// ---------- navigation ----------
+function goTab(name){
+  document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x.dataset.s===name));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on',s.id==='s-'+name));
+  $('fab').style.display=name==='time'?'flex':'none';
+}
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{goTab(b.dataset.s);render()});
+
+// ---------- Google Calendar (alerts even when the phone is locked) ----------
+function confirmCalendarShare(id){
+  const p=P(),m=p&&p.meds.find(x=>x.id===id);if(!p||!m)return false;
+  const message=profileAge(p.dob)<=18
+    ?'Parent or guardian: this opens Google Calendar and shares the medicine name and dose. Continue?'
+    :'This opens Google Calendar and shares the medicine name and dose. Continue?';
+  return window.confirm(message);
+}
+function calLink(m){
+  const s=parseD(m.start),[h,mi]=m.time.split(':').map(Number),ev=m.every||1;
+  const st=new Date(s.getFullYear(),s.getMonth(),s.getDate(),h,mi),en=new Date(st.getTime()+15*60000);
+  const f=d=>d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'T'+pad(d.getHours())+pad(d.getMinutes())+'00';
+  const rec='RRULE:FREQ=DAILY;INTERVAL='+ev+(m.days>=3650?'':';COUNT='+Math.max(1,Math.ceil(m.days/ev)));
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Take '+m.name)
+    +'&details='+encodeURIComponent(m.dose+' (from '+APP+')')+'&dates='+f(st)+'/'+f(en)+'&recur='+encodeURIComponent(rec);
+}
+
+
+function bdayInfo(dob){
+  const b=parseD(dob),t=midnight();
+  const mk=y=>{const d=(b.getMonth()===1&&b.getDate()===29&&new Date(y,1,29).getMonth()!==1)?28:b.getDate();return new Date(y,b.getMonth(),d)};
+  let nb=mk(t.getFullYear());if(nb<t)nb=mk(t.getFullYear()+1);
+  return {left:Math.round((nb-t)/864e5),age:nb.getFullYear()-b.getFullYear()};
+}
+// ---------- profile details ----------
+function setVoice(on){const p=P();if(!p)return;p.voiceAlerts=!!on;save();if(!on){try{window.speechSynthesis&&window.speechSynthesis.cancel()}catch(e){}}toast(on?'Spoken alert on':'Spoken alert off')}
+function closeProfileDetails(){$('profile-view').classList.remove('on')}
+function openProfileDetails(){
+  const p=P();if(!p)return;
+  closeDrawer();
+  const bd=bdayInfo(p.dob),age=profileAge(p.dob);
+  const nextBirthday=addDays(midnight(),bd.left);
+  const dateOfBirth=fmtLong(parseD(p.dob));
+  const accepted=p.agreed?new Date(p.agreed).toLocaleDateString('en',{day:'numeric',month:'long',year:'numeric'}):'Not available';
+  const meds=[...p.meds].sort((a,b)=>a.time.localeCompare(b.time));
+  const medicineHtml=meds.length?meds.map(m=>{
+    const end=m.days>=3650?'No end date':fmtD(addDays(parseD(m.start),m.days-1));
+    return `<div class="profile-med"><b>${esc(m.name)}</b><small>${esc(m.dose||'No dose instructions entered')} · ${fmt(m.time)}<br>Starts ${fmtD(parseD(m.start))} · ${esc(end)}${(m.every||1)>1?' · Repeats every '+m.every+' days':''}</small><small>${m.review?'Needs checking against the current prescription or label':'Reminder details marked as checked'}</small></div>`;
+  }).join(''):'<div class="profile-empty">No scheduled medicines have been added.</div>';
+  const prnHtml=p.prn.length?p.prn.map(m=>`<div class="profile-med"><b>${esc(m.name)}</b><small>${esc(m.dose||'No additional instructions entered')} · As needed (no timed reminder)</small></div>`).join(''):'<div class="profile-empty">No as-needed medicines are recorded.</div>';
+  const routine=p.routine||DEF_ROUTINE;
+  const routineNames=[['Breakfast','breakfast'],['Lunch','lunch'],['Evening','evening'],['Dinner','dinner'],['Bedtime','bedtime']];
+  const routineHtml=routineNames.map(([label,key])=>`<div><span>${label}</span><b>${routine[key]?fmt(routine[key]):'Not set'}</b></div>`).join('');
+  const protection=p.pin?'PIN protection is on':'PIN protection is off';
+  const alertHtml=`<div class="profile-routine"><div><span>Spoken alert</span><b>${p.voiceAlerts===false?'Off':'On'}</b></div><div><span>Sound level</span><b>${p.alertVolume||90}%</b></div></div>`;
+  $('profile-content').innerHTML=`
+    <div class="profile-identity"><div class="avatar">${esc(ini(p.name))}</div><div><h3>${esc(p.name)}</h3><p>MediMate profile · ${age} years old</p></div></div>
+    <section class="profile-section"><h3>Personal details</h3><div class="profile-data">
+      <div class="datum"><small>Full name</small><b>${esc(p.name)}</b></div>
+      <div class="datum"><small>Age</small><b>${age} years</b></div>
+      <div class="datum"><small>Date of birth</small><b>${dateOfBirth}</b></div>
+      <div class="datum"><small>Terms accepted</small><b>${accepted}</b></div>
+    </div></section>
+    <section class="profile-section"><h3>Scheduled medicines (${meds.length})</h3>${medicineHtml}</section>
+    <section class="profile-section"><h3>Daily routine</h3><div class="profile-routine">${routineHtml}</div></section>
+    <section class="profile-section"><h3>Reminder alert settings</h3><label class="switchrow"><span><b>Spoken alert</b><small>Speak a message along with the ringtone</small></span><input type="checkbox" id="pv-voice" ${p.voiceAlerts===false?'':'checked'} onchange="setVoice(this.checked)"></label></section>
+    <p class="profile-note" style="padding:0 4px 12px">For users aged 18 and younger, a parent or legal guardian must continue to check the medicines and supervise medicine-taking. Keep this profile private because it contains personal and medicine information.</p>`;
+  $('profile-view').classList.add('on');
+  $('profile-view').scrollTop=0;
+}
+
+// ---------- render ----------
+function medCard(m,d,o){
+  const done=isTaken(m,d),n=new Date();
+  const missed=!!o.check&&!done&&dkey(d)===dkey(midnight())&&(n.getHours()*60+n.getMinutes())-toMin(m.time)>MISS_MIN;
+  const og=m.days>=3650,ev=m.every||1;
+  const range=o.edit?`<small>${og?'From '+fmtD(parseD(m.start))+' · no end date':fmtD(parseD(m.start))+' to '+fmtD(addDays(parseD(m.start),m.days-1))+' · '+m.days+' day'+(m.days==1?'':'s')}${ev>1?' · every '+ev+' days':''}</small>`:'';
+  return `<div class="card ${done&&o.check?'done':''}">
+    <div class="ic"><span class="ms">medication</span></div>
+    <div class="m"><b>${esc(m.name)}${m.review?`<span class="tag">${m.nodur?'Set days':'Check me'}</span>`:''}${missed?'<span class="tag red">Not recorded</span>':''}</b><small>${fmt(m.time)} · ${esc(m.dose)}</small>${range}</div>
+    ${o.check&&!m.review?`<button class="iconbtn" aria-label="${done?'Mark as not taken':'Mark as taken'}: ${esc(m.name)}" onclick="toggleTaken(${m.id})"><span class="ms" style="color:${done?'#34a853':'#747775'}">${done?'check_circle':'radio_button_unchecked'}</span></button>`:o.check&&m.review?'<span class="tag">Check before use</span>':''}
+    ${o.edit?`<a class="iconbtn" aria-label="Add ${esc(m.name)} to Google Calendar" href="${esc(calLink(m))}" target="_blank" rel="noopener" onclick="return confirmCalendarShare(${m.id})"><span class="ms">event</span></a>
+              <button class="iconbtn" aria-label="Edit ${esc(m.name)}" onclick="openEdit(${m.id})"><span class="ms">edit</span></button>
+              <button class="iconbtn" aria-label="Delete ${esc(m.name)}" onclick="delMed(${m.id})"><span class="ms">delete</span></button>`:''}
+  </div>`}
+
+function grouped(list,d,o){
+  const G=[['Morning','wb_twilight',m=>m.time<'12:00'],['Afternoon','wb_sunny',m=>m.time>='12:00'&&m.time<'17:00'],['Evening','bedtime',m=>m.time>='17:00']];
+  return G.map(([t,ic,f])=>{const l=list.filter(f);
+    return l.length?`<div class="sec">${t}</div><div class="hbody">${l.map(m=>medCard(m,d,o)).join('')}</div>`:''}).join('');
+}
+
+function render(){
+  const p=P();if(!p)return;
+  today=midnight();
+  $('av').textContent=ini(p.name);$('pname').textContent=p.name;
+  const now=new Date(),nowMin=now.getHours()*60+now.getMinutes(),hr=now.getHours();
+  $('greet').textContent=hr<12?'Good morning':hr<17?'Good afternoon':'Good evening';
+  $('hdate').textContent=today.toLocaleDateString('en',{weekday:'long',day:'numeric',month:'long'});
+  const bd=bdayInfo(p.dob),nm=esc(p.name);
+  $('bday').innerHTML=bd.left>10?'':bd.left===0
+    ?`<div class="bcard"><div class="bnum"><b>🎂</b></div><div class="btxt"><div class="bt1">Happy birthday, ${nm}!</div><div class="bt2">Have a lovely birthday, ${nm}!</div></div></div>`
+    :`<div class="bcard"><div class="bnum"><b>${bd.left}</b><small>day${bd.left==1?'':'s'}</small></div><div class="btxt"><div class="bt1">until your birthday 🎂</div><div class="bt2">Have a lovely birthday, ${nm}!</div></div></div>`;
+  const list=medsOn(today),pending=list.filter(m=>!m.review&&!isTaken(m,today));
+  const nxt=pending.find(m=>toMin(m.time)>=nowMin-MISS_MIN)||pending[0];
+  if(!p.meds.length)
+    $('nextcard').innerHTML=`<div class="ncard"><div class="lbl">GET STARTED</div><div class="n" style="margin:6px 0 14px">Add a medicine using the details from the current prescription or medicine label.</div>
+      <button class="btn big" onclick="goTab('time');render()"><span class="ms">schedule</span>Open timetable</button></div>`;
+  else if(nxt){
+    const diff=toMin(nxt.time)-nowMin,ad=Math.abs(diff);
+    const t=(ad>=60?Math.floor(ad/60)+' h ':'')+(ad%60)+' min';
+    const txt=diff===0?'now':diff>0?'in '+t:'was due '+t+' ago';
+    $('nextcard').innerHTML=`<div class="ncard"><div class="nrow"><div><div class="lbl">NEXT MEDICINE</div><div class="t">${fmt(nxt.time)}</div></div><span class="chip ${diff<0?'over':''}">${txt}</span></div>
+      <div class="n">${esc(nxt.name)}</div><div class="d">${esc(nxt.dose)}</div>
+      <button class="btn big" onclick="toggleTaken(${nxt.id})"><span class="ms">check</span>Mark as taken</button></div>`;
+  }else if(list.some(m=>m.review))
+    $('nextcard').innerHTML=`<div class="ncard"><div class="lbl">CHECK REMINDERS</div><div class="n" style="margin-top:6px">Some medicine details need to be checked in the Timetable before they can remind you.</div></div>`;
+  else if(list.length)
+    $('nextcard').innerHTML=`<div class="ncard ok"><div class="lbl" style="color:#0a3818">TODAY'S REMINDERS REVIEWED</div><div class="t">No more reminders due today.</div></div>`;
+  else
+    $('nextcard').innerHTML=`<div class="ncard"><div class="lbl">NOTHING SCHEDULED</div><div class="n" style="margin-top:6px">No medicines today</div></div>`;
+  const dn=list.length-pending.length;
+  $('todaylist').innerHTML=list.length?grouped(list,today,{check:true}):'<div class="empty">No medicines today</div>';
+  $('warn').style.display=storageOk?'none':'block';
+  $('tcount').textContent=p.meds.length+' medicine'+(p.meds.length==1?'':'s')+' scheduled';
+  if(!scanning){
+    const rev=p.meds.filter(m=>m.review),nod=rev.filter(m=>m.nodur).length,chk=rev.length-nod;
+    $('reviewbar').innerHTML=(chk?`<div class="banner">Please check each reminder against the current prescription. For a child, a parent or guardian must do this. Unchecked reminders will not ring.<br><button class="btn" onclick="confirmAll()">I have checked these reminders</button></div>`:'')
+      +(nod?`<div class="banner">${nod} reminder${nod==1?' has':'s have'} no end date in the prescription. Tap the pencil and set the number of days, or tick "No end date" for long-term medicines.</div>`:'');
+    const all=[...p.meds].sort((a,b)=>a.time.localeCompare(b.time));
+    $('timelist').innerHTML=(all.length?grouped(all,today,{edit:true}):'<div class="empty">Nothing yet. Tap Add to enter a medicine exactly as prescribed.</div>')
+      +(p.prn.length?`<div class="sec">As needed (no reminder)</div><div class="hbody">${p.prn.map(x=>`<div class="card"><div class="ic"><span class="ms">medication</span></div><div class="m"><b>${esc(x.name)}</b><small>${esc(x.dose||'Take only when needed')}</small></div><button class="iconbtn" aria-label="Delete ${esc(x.name)}" onclick="delPrn(${x.id})"><span class="ms">delete</span></button></div>`).join('')}</div>`:'');
+  }
+  renderCal();
+  if($('profile-view').classList.contains('on'))openProfileDetails();
+}
+function confirmAll(){
+  const p=P();if(!p)return;
+  const child=profileAge(p.dob)<=18;
+  const message=child
+    ?'Parent or guardian: have you checked every medicine name, dose, time and duration against the current prescription or label? Confirm only after checking.'
+    :'Have you checked every medicine name, dose, time and duration against the current prescription or label?';
+  if(!window.confirm(message))return;
+  p.meds.forEach(m=>{if(!m.nodur)m.review=false});save();render();
+}
+function delPrn(id){const p=P();p.prn=p.prn.filter(x=>x.id!==id);save();render()}
+function toggleTaken(id){
+  const p=P(),m=p&&p.meds.find(x=>x.id===id);if(!p||!m||m.review)return;
+  const k=dkey(today)+'_'+id,was=!!p.taken[k];
+  const message=was?'Remove the taken mark for '+m.name+'?':'Record '+m.name+' as taken? Only confirm after the person has actually taken it as prescribed. For a child, check with a parent or guardian.';
+  if(!window.confirm(message))return;
+  p.taken[k]=!was;save();render();
+}
+function delMed(id){
+  const p=P(),i=p.meds.findIndex(m=>m.id===id);if(i<0)return;
+  const [gone]=p.meds.splice(i,1);save();render();
+  toast('Medicine deleted',{label:'Undo',fn:()=>{p.meds.push(gone);save();render()}});
+}
+
+// ---------- calendar ----------
+function shiftMonth(n){calM+=n;if(calM<0){calM=11;calY--}if(calM>11){calM=0;calY++}renderCal()}
+function renderCal(){
+  const first=new Date(calY,calM,1),n=new Date(calY,calM+1,0).getDate();
+  $('monthname').textContent=first.toLocaleString('en',{month:'long',year:'numeric'});
+  let h=['S','M','T','W','T','F','S'].map(x=>`<div class="dow">${x}</div>`).join('');
+  for(let i=0;i<first.getDay();i++)h+='<div></div>';
+  for(let d=1;d<=n;d++){
+    const dt=new Date(calY,calM,d);
+    const c=['day',medsOn(dt).length?'has':'',dkey(dt)===dkey(today)?'today':'',dkey(dt)===dkey(selDay)?'sel':''].join(' ');
+    h+=`<div class="${c}" onclick="pickDay(${calY},${calM},${d})">${d}</div>`;
+  }
+  $('grid').innerHTML=h;
+  const L=medsOn(selDay);
+  $('daytitle').textContent=selDay.toLocaleDateString('en',{weekday:'long',day:'numeric',month:'long'})+' · '+L.length+' medicine'+(L.length==1?'':'s');
+  $('daylist').innerHTML=L.length?grouped(L,selDay,{}):'<div class="empty">No medicines on this day</div>';
+}
+function pickDay(y,m,d){selDay=new Date(y,m,d);renderCal()}
+
+// ---------- edit dialog ----------
+function openEdit(id){
+  editing=id;const m=P().meds.find(x=>x.id===id);
+  $('dtitle').textContent=m?'Edit medicine':'Add medicine';
+  $('f-name').value=m?m.name:'';$('f-dose').value=m?m.dose:'';
+  $('f-time').value=m?m.time:'09:00';$('f-start').value=m?m.start:dkey(today);
+  const og=!!m&&m.days>=3650;
+  $('f-ongoing').checked=og;$('f-days').disabled=og;$('f-days').value=m&&!og?m.days:7;$('f-every').value=m?(m.every||1):1;
+  $('f-err').textContent='';$('scrim').classList.add('on');
+}
+function closeEdit(){$('scrim').classList.remove('on')}
+$('f-ongoing').onchange=()=>{$('f-days').disabled=$('f-ongoing').checked};
+function saveEdit(){
+  const og=$('f-ongoing').checked;
+  const p=P();
+  const needsAdultReview=!!p&&profileAge(p.dob)<=18;
+  const o={name:$('f-name').value.trim(),dose:$('f-dose').value.trim(),time:$('f-time').value,
+    days:og?3650:Math.min(365,Math.max(1,parseInt($('f-days').value)||1)),
+    every:Math.min(30,Math.max(1,parseInt($('f-every').value)||1)),start:$('f-start').value,review:needsAdultReview,nodur:false};
+  if(!o.name||!o.time){$('f-err').textContent='Please enter a name and a time.';return}
+  if(!o.start){$('f-err').textContent='Please choose a start date.';return}
+  if(editing){Object.assign(p.meds.find(x=>x.id===editing),o)}
+  else p.meds.push({id:p.nextId++,...o});
+  save();closeEdit();render();
+}
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Enter')return;
+  if($('pscrim').classList.contains('on'))saveProfile();
+  else if($('scrim').classList.contains('on'))saveEdit();
+  else if($('nscrim').classList.contains('on'))checkPin();
+});
+
+// ---------- adult-only prescription image OCR (text extraction only) ----------
+let ocrWorker=null,ocrBusy=false;
+function openPrescriptionPicker(){
+  const p=P();
+  if(!p||profileAge(p.dob)<=18){toast('Prescription image scanning is available only for profiles aged 19 or older.');return}
+  $('rxfile').click();
+}
+async function scanPrescription(input){
+  const file=input.files&&input.files[0];input.value='';if(!file)return;
+  const p=P();
+  if(!p||profileAge(p.dob)<=18){toast('This profile is not eligible for prescription image scanning.');return}
+  if(!file.type||!file.type.startsWith('image/')){toast('Please choose an image file, such as JPG or PNG.');return}
+  if(file.size>12*1024*1024){toast('Please choose an image smaller than 12 MB.');return}
+  if(ocrBusy){toast('A scan is already running.');return}
+  ocrBusy=true;const pid=p.id;$('rx-text').value='';$('rx-status').textContent='Preparing the on-device text scanner…';$('rxscrim').classList.add('on');
+  let worker=null;
+  try{
+    if(!window.Tesseract||typeof window.Tesseract.createWorker!=='function')throw new Error('The text scanner did not load. Check your internet connection and try again, or enter the details manually.');
+    worker=await window.Tesseract.createWorker('eng',1,{logger:m=>{
+      if(!P()||P().id!==pid)return;
+      const pct=typeof m.progress==='number'?' '+Math.round(m.progress*100)+'%':'';
+      $('rx-status').textContent=(m.status||'Reading image…')+pct+' · Keep this window open.';
+    }});
+    ocrWorker=worker;
+    const result=await worker.recognize(file);
+    if(!P()||P().id!==pid){$('rx-status').textContent='Profile changed. The scan was discarded.';return}
+    const text=(result&&result.data&&result.data.text||'').trim();
+    $('rx-text').value=text;
+    $('rx-status').textContent=text?'Text extraction finished. Check every word and number against the original image.':'No readable text was found. Try a sharper, brighter, straight-on image.';
+  }catch(e){
+    console.error('Prescription OCR error',e);
+    $('rx-status').textContent=(e&&e.message)||'The image could not be read. Please enter the details manually.';
+  }finally{
+    if(worker){try{await worker.terminate()}catch(e){}}
+    if(ocrWorker===worker)ocrWorker=null;ocrBusy=false;
+  }
+}
+function closePrescriptionScan(){
+  $('rxscrim').classList.remove('on');$('rx-text').value='';$('rx-status').textContent='Choose a clear, well-lit image. Text recognition can make mistakes.';
+}
+async function copyPrescriptionText(){
+  const value=$('rx-text').value;if(!value){toast('There is no recognised text to copy.');return}
+  try{await navigator.clipboard.writeText(value);toast('Recognised text copied. Please verify it against the original.');}
+  catch(e){$('rx-text').focus();$('rx-text').select();try{document.execCommand('copy');toast('Text copied. Please verify it against the original.')}catch(e2){toast('Select the text and copy it manually.')}}
+}
+
+// ---------- resilient error fallback: no silent blank app screen ----------
+function showAppError(message){
+  try{$('app-error-msg').textContent=message||'Something interrupted this screen. Your saved data has not intentionally been erased. Try again or return to profiles.';$('app-error').classList.add('on')}catch(e){console.error('MediMate fallback unavailable',e)}
+}
+function recoverApp(){
+  $('app-error').classList.remove('on');
+  try{if(P()){goTab('home');render()}else forceShowProfiles()}catch(e){showAppError('The screen could not be restored. Your browser may be blocking local storage or required features. Return to profiles or refresh the notebook output.');}
+}
+function forceShowProfiles(){
+  try{endRing();closeDrawer();closeOnboard();closeProfileDetails();$('app-error').classList.remove('on');store.current=null;renderChooser();$('profiles').style.display='block'}catch(e){showAppError('MediMate could not reopen the profile list. Refresh the notebook output and try again.')}
+}
+window.addEventListener('error',e=>{if(e.target&&e.target!==window){console.warn('Optional resource could not load',e.target.src||e.target.href||'resource');return;}console.error('MediMate error',e.error||e.message);showAppError('A screen could not be displayed correctly. Your saved data should remain in this browser. Try again or return to profiles.')});
+window.addEventListener('unhandledrejection',e=>{console.error('MediMate async error',e.reason);showAppError('A background task failed. Your saved data should remain in this browser. Try again or return to profiles.')});
+
+// ---------- start ----------
+document.querySelector('#s-home .apptitle').textContent=APP;
+$('warn').style.display=storageOk?'none':'block';
+$('b-text').oninput=()=>{restoreArmed=false;$('b-err').textContent=''};
+document.addEventListener('click',()=>{unlockAudio();enableMotion();askPermission()},{once:true,capture:true});
+renderChooser();checkReminders();scheduleNative();
+setTimeout(()=>{
+  const sp=$('splash');sp.style.opacity=0;setTimeout(()=>sp.remove(),600);
+  if(!store.profiles.length)openAddProfile();
+  else if(store.profiles.length===1)openProfile(store.profiles[0].id);   // one profile: go straight in
+},1500);
+</script>
+
+</body></html>
